@@ -87,9 +87,17 @@ def run_game(stdscr):
                        player_state['angle'], current_map, current_colors)
             
             if should_shoot and current_time - player_state['last_shot_time'] > player_state['shot_cooldown']:
+                # First draw the world so it's visible behind the animation
+                if not player_state['map_mode']:
+                    render_world(stdscr, player_state['x'], player_state['y'], 
+                              player_state['angle'], current_map, current_colors)
+                
+                # Then draw the shooting animation on top
                 shoot_animation(stdscr, stdscr.getmaxyx()[0], stdscr.getmaxyx()[1])
                 player_state['last_shot_time'] = current_time
                 ui.add_status_effect("Shot fired", "!", duration=1.0, color=1)
+        
+        # Draw UI layer on top of everything
         ui.draw_ui_layer(stdscr)
         curses.doupdate()
         
