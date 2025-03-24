@@ -37,6 +37,12 @@ def create_player(x=1.5, y=1.5, angle=0.0):
 
         'last_shot_time': 0,
         'shot_cooldown': 0.5,
+        
+        'health': 100,
+        'max_health': 100,
+        'level': 1,
+        'exp': 0,
+        'exp_to_next': 100
     }
 
 

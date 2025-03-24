@@ -101,12 +101,47 @@ def clear_expired_elements(current_time):
                    current_time - elem['start_time'] < elem['duration']]
 
 
-def draw_ui_layer(stdscr):
+def draw_player_stats(stdscr, player_state):
+    """Draw player health and level in the top-left corner"""
+    if not player_state:
+        return
+
+    health = player_state.get('health', 100)
+    max_health = player_state.get('max_health', 100)
+    level = player_state.get('level', 1)
+
+    health_percent = health / max_health
+    bar_width = 20
+    filled_width = int(bar_width * health_percent)
+
+    health_bar = f"[{'█' * filled_width}{'░' * (bar_width - filled_width)}]"
+
+    level_text = f"LVL: {level}"
+    health_text = f"HP: {health}/{max_health} {health_bar}"
+
+    try:
+        stdscr.addstr(1, 2, level_text, curses.color_pair(3) | curses.A_BOLD)
+
+        health_color = 2
+        if health_percent < 0.3:
+            health_color = 1
+        elif health_percent < 0.7:
+            health_color = 3
+
+        stdscr.addstr(2, 2, health_text, curses.color_pair(health_color) | curses.A_BOLD)
+    except curses.error:
+        pass
+
+
+def draw_ui_layer(stdscr, player_state=None):
     """Draw all active UI elements on top of the game view"""
     height, width = stdscr.getmaxyx()
     current_time = time.time()
 
     clear_expired_elements(current_time)
+
+    if player_state:
+        draw_player_stats(stdscr, player_state)
 
     messages = [elem for elem in ui_elements if elem['type'] == UI_MESSAGE]
     if messages:

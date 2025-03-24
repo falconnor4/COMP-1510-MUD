@@ -137,7 +137,7 @@ def run_game(stdscr):
             render_world(stdscr, player_state['x'], player_state['y'],
                          player_state['angle'], current_map, current_colors,
                          player_state)  # Pass player_state for head-bob
-        ui.draw_ui_layer(stdscr)
+        ui.draw_ui_layer(stdscr, player_state)  # Pass player_state for UI stats
 
         # SINGLE screen update per frame - this is key to eliminating flicker
         curses.doupdate()
