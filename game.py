@@ -5,9 +5,9 @@ from curses import wrapper
 # Import our modules
 from renderer import init_colors, render_world, render_full_map
 from player import create_player, update_input, update_player
-from map import ACTIVE_MAP, ACTIVE_COLORS, interact_raycast, switch_map
+from map.static_map import ACTIVE_MAP, ACTIVE_COLORS, interact_raycast, switch_map
 from menu import display_menu
-import ui  # Import our new UI module
+import ui
 import entities
 
 
