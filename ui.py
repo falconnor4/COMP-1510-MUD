@@ -2,6 +2,7 @@ import curses
 import time
 import math
 from anim.hand.fire import FireFrames
+from debug import render_console, DEBUG_CONSOLE
 
 UI_MESSAGE = 'message'
 UI_STATUS = 'status'
@@ -102,24 +103,36 @@ def clear_expired_elements(current_time):
 
 
 def draw_player_stats(stdscr, player_state):
-    """Draw player health and level in the top-left corner"""
+    """Draw player health, level and dungeon depth in the top-left corner"""
     if not player_state:
         return
 
     health = player_state.get('health', 100)
     max_health = player_state.get('max_health', 100)
     level = player_state.get('level', 1)
+    depth = player_state.get('stages_descended', 0)
+    exp = player_state.get('exp', 0)
+    exp_to_next = player_state.get('exp_to_next', 100)
+    kills = player_state.get('kills', 0)
 
     health_percent = health / max_health
-    bar_width = 20
-    filled_width = int(bar_width * health_percent)
+    exp_percent = exp / exp_to_next
 
-    health_bar = f"[{'█' * filled_width}{'░' * (bar_width - filled_width)}]"
+    bar_width = 20
+    filled_health = int(bar_width * health_percent)
+    filled_exp = int(bar_width * exp_percent)
+
+    health_bar = f"[{'█' * filled_health}{'░' * (bar_width - filled_health)}]"
+    exp_bar = f"[{'█' * filled_exp}{'░' * (bar_width - filled_exp)}]"
 
     level_text = f"LVL: {level}"
     health_text = f"HP: {health}/{max_health} {health_bar}"
+    exp_text = f"XP: {exp}/{exp_to_next} {exp_bar}"
+    depth_text = f"DEPTH: {depth}" if depth > 0 else "DEPTH: Surface"
+    kills_text = f"KILLS: {kills}"
 
     try:
+
         stdscr.addstr(1, 2, level_text, curses.color_pair(3) | curses.A_BOLD)
 
         health_color = 2
@@ -127,8 +140,13 @@ def draw_player_stats(stdscr, player_state):
             health_color = 1
         elif health_percent < 0.7:
             health_color = 3
-
         stdscr.addstr(2, 2, health_text, curses.color_pair(health_color) | curses.A_BOLD)
+
+        stdscr.addstr(3, 2, exp_text, curses.color_pair(6) | curses.A_BOLD)
+
+        stdscr.addstr(4, 2, depth_text, curses.color_pair(5) | curses.A_BOLD)
+
+        stdscr.addstr(5, 2, kills_text, curses.color_pair(1) | curses.A_BOLD)
     except curses.error:
         pass
 
@@ -190,8 +208,10 @@ def draw_ui_layer(stdscr, player_state=None):
 
     if current_animation['active']:
         draw_animation_frame(stdscr)
-
         update_animation()
+
+    if DEBUG_CONSOLE['active']:
+        render_console(stdscr)
 
     stdscr.noutrefresh()
 
