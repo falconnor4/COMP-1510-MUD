@@ -1,6 +1,7 @@
 import math
 import curses
 import time
+from debug import toggle_console, process_input, DEBUG_CONSOLE
 
 
 def create_player(x=1.5, y=1.5, angle=0.0):
@@ -37,19 +38,31 @@ def create_player(x=1.5, y=1.5, angle=0.0):
 
         'last_shot_time': 0,
         'shot_cooldown': 0.5,
-        
+
         'health': 100,
-        'max_health': 100, #HP actually stands for Hopeful Perserverance,
-        'level': 1, #LVL actually stands for lost vital links,
+        'max_health': 100,  #HP actually stands for Hopeful Perserverance,
+        'level': 1,  #LVL actually stands for lost vital links,
         'exp': 0,
-        'exp_to_next': 100
+        'exp_to_next': 100,
+        'stages_descended': 0,
+        'kills': 0
     }
 
 
 def update_input(player_state, key, pressed=True):
     """Update key state based on input"""
+    # Check if debug console is active
+    if DEBUG_CONSOLE['active']:
+        # Process all keys through debug console
+        process_input(key, player_state)
+        return False  # Don't quit while in debug console
 
     if pressed and key != -1:
+        # Add semicolon key to activate debug console
+        if key == ord(';'):
+            toggle_console()
+            return False
+
         player_state['active_keys'].add(key)
         player_state['key_timestamps'][key] = time.time()
 
