@@ -9,6 +9,7 @@ from map.static_map import ACTIVE_MAP, ACTIVE_COLORS, interact_raycast, switch_m
 from menu import display_menu
 import ui
 import entities
+import debug
 
 
 # pip install windows-curses  # Only for Windows users as Unix-based systems have curses pre-installed
@@ -36,8 +37,46 @@ def run_game(stdscr):
     # Initialize entities
     entities.spawn_enemies(current_map, 5)  # Spawn 5 enemies
 
+    # Setup debug commands
+    def change_level():
+        """Debug command to change level"""
+        nonlocal current_map, current_colors
+        new_map, new_colors, player_spawn, is_new_dungeon = switch_map(
+            2 if current_map == ACTIVE_MAP else 1)
+        current_map = new_map
+        current_colors = new_colors
+
+        # Move player to spawn point
+        player_state['x'], player_state['y'] = player_spawn
+
+        # Track stage descent if entering a new dungeon level
+        if is_new_dungeon:
+            player_state['stages_descended'] += 1
+            # Show dungeon type message
+            from map.static_map import CURRENT_COLOR_SHIFT
+            dungeon_types = {
+                0: "Cave",
+                1: "Ancient Ruins",
+                2: "Forgotten Crypt",
+                3: "Overgrown Forest",
+                4: "Abandoned Tech Facility"
+            }
+            dungeon_type = dungeon_types.get(CURRENT_COLOR_SHIFT, "Strange Area")
+            ui.add_message(f"DEBUG: Entered {dungeon_type} - Depth {player_state['stages_descended']}", 3.5, color=5)
+
+        # Update enemies for the new level
+        entities.clear_entities()
+        enemy_count = 5 + player_state['stages_descended'] // 2
+        entities.spawn_enemies(current_map, enemy_count)
+
+        return f"Changed to level {player_state['stages_descended']}"
+
+    # Register debug commands
+    debug.COMMANDS['next']['callback'] = change_level
+
     # Welcome message :)
     ui.add_message("Welcome to the game! Press 'E' to interact with objects.", 5.0)
+    ui.add_message("Press ';' to open debug console", 5.0, color=6)
 
     while running:
         current_time = time.time()
@@ -57,7 +96,7 @@ def run_game(stdscr):
                 running = False
 
         # Update player based on current active keys
-        if not player_state['map_mode']:
+        if not player_state['map_mode'] and not debug.DEBUG_CONSOLE['active']:
             should_shoot, should_interact = update_player(player_state, delta_time, current_map)
 
             # Handle shooting
@@ -94,13 +133,14 @@ def run_game(stdscr):
                 player_state['last_shot_time'] = current_time
                 ui.add_status_effect("Shot fired", "!", duration=1.0, color=1)
 
-            # Update entities
+            # Update entities with player state for XP awards
             entities.update_entities(
                 delta_time,
                 current_map,
                 player_state['x'],
                 player_state['y'],
-                player_state['angle']
+                player_state['angle'],
+                player_state  # Pass player_state to entities for XP awards
             )
 
             # Handle interaction
@@ -111,11 +151,41 @@ def run_game(stdscr):
                 )
 
                 if object_type == 'door':
-                    # Handle door interaction - switch maps
-                    new_map, new_colors = switch_map(2 if current_map == ACTIVE_MAP else 1)
+                    # Generate a new dungeon level and update map/colors
+                    new_map, new_colors, player_spawn, is_new_dungeon = switch_map(
+                        2 if current_map == ACTIVE_MAP else 1)
                     current_map = new_map
                     current_colors = new_colors
-                    ui.add_message("You entered a door to a new area!", 3.0, color=5)
+
+                    # Move player to spawn point
+                    player_state['x'], player_state['y'] = player_spawn
+
+                    # Track stage descent if entering a new dungeon level
+                    if is_new_dungeon:
+                        player_state['stages_descended'] += 1
+
+                        # Determine dungeon type from static_map's CURRENT_COLOR_SHIFT
+                        from map.static_map import CURRENT_COLOR_SHIFT
+                        dungeon_types = {
+                            0: "Cave",
+                            1: "Ancient Ruins",
+                            2: "Forgotten Crypt",
+                            3: "Overgrown Forest",
+                            4: "Abandoned Tech Facility"
+                        }
+                        dungeon_type = dungeon_types.get(CURRENT_COLOR_SHIFT, "Strange Area")
+
+                        # Show dungeon type message
+                        ui.add_message(f"Entered {dungeon_type} - Depth {player_state['stages_descended']}", 3.5,
+                                       color=5)
+
+                    # Update enemies for the new level - respawn with increased difficulty based on depth
+                    entities.clear_entities()
+                    enemy_count = 5 + player_state['stages_descended'] // 2  # Increase enemy count with depth
+                    entities.spawn_enemies(current_map, enemy_count)
+
+                    ui.add_message(f"You descended to dungeon depth {player_state['stages_descended']}...", 3.0,
+                                   color=5)
 
                 elif object_type == 'stairs':
                     ui.add_message("Well. You found stairs, but they don't lead anywhere yet.", 3.0)
@@ -140,6 +210,12 @@ def run_game(stdscr):
         ui.draw_ui_layer(stdscr, player_state)  # Pass player_state for UI stats
 
         # SINGLE screen update per frame - this is key to eliminating flicker
+        if debug.DEBUG_CONSOLE['active']:
+            stdscr.move(0, len("> ") + debug.DEBUG_CONSOLE['cursor_pos'])
+            curses.curs_set(1)  # Show cursor in debug mode
+        else:
+            curses.curs_set(0)  # Hide cursor in gameplay
+
         curses.doupdate()
 
         # Cap frame rate

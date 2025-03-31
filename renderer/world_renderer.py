@@ -32,7 +32,7 @@ def get_shading_set(wall_orientation='vertical'):
     return SHADING_CHARS
 
 
-def get_distance_shade(distance, max_distance=20, wall_x=0, wall_y=0):
+def get_distance_shade(distance, max_distance=40, wall_x=0, wall_y=0):
     """Get appropriate shading character and attributes based on distance"""
     norm_distance = min(1.0, distance / max_distance)
     shade_idx = min(len(SHADING_CHARS) - 1, int((1 - norm_distance) * len(SHADING_CHARS)))
