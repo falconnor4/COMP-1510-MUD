@@ -53,7 +53,7 @@ def update_input(player_state, key, pressed=True):
     """Update key state based on input"""
     # Check if debug console is active
     if DEBUG_CONSOLE['active']:
-        # Process all keys through debug console
+        # Process all keys through debug console with player state
         process_input(key, player_state)
         return False  # Don't quit while in debug console
 

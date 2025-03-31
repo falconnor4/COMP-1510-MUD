@@ -212,7 +212,7 @@ def generate_dungeon(width, height, archetype_key=None):
     
     return dungeon, archetype_key
 
-def generate_dungeon_level(width=40, height=20, min_room_size=5, max_splits=4):
+def generate_dungeon_level(width=40, height=20, min_room_size=5, max_splits=4, player_level=1):
     """Generate dungeon with spawn and door - maintains compatibility with existing code"""
     
     dungeon_map, archetype = generate_dungeon(width, height)
@@ -226,7 +226,12 @@ def generate_dungeon_level(width=40, height=20, min_room_size=5, max_splits=4):
     
     door_point = find_farthest_point(dungeon_map, spawn_x, spawn_y)
     door_x, door_y = door_point
-    dungeon_map[door_y][door_x] = 6  
+    
+    
+    if player_level >= 3:
+        dungeon_map[door_y][door_x] = 10  
+    else:
+        dungeon_map[door_y][door_x] = 6   
     
     
     add_features(dungeon_map, archetype)
@@ -363,11 +368,25 @@ def find_farthest_point(dmap, sx, sy):
         'x_max': w - 2, 'y_max': h - 2
     }
     
+    
+    is_forest_map = False
+    tree_count = 0
+    for y in range(1, h-1):
+        for x in range(1, w-1):
+            if dmap[y][x] == 2:  
+                tree_count += 1
+                if tree_count > 10:  
+                    is_forest_map = True
+                    break
+        if is_forest_map:
+            break
+    
     open_set, closed_set = [], set()
     g_scores = {(sx, sy): 0}
     heapq.heappush(open_set, (0, sx, sy))
     
     best_point, max_dist = (sx, sy), 0
+    min_distance_required = 10  
     
     while open_set:
         _, cx, cy = heapq.heappop(open_set)
@@ -379,21 +398,53 @@ def find_farthest_point(dmap, sx, sy):
         in_target = (target_area['x_min'] <= cx <= target_area['x_max'] and
                     target_area['y_min'] <= cy <= target_area['y_max'])
         
-        if curr_dist > max_dist and is_good_door_spot(dmap, cx, cy):
-            if in_target or not (target_area['x_min'] <= best_point[0] <= target_area['x_max'] and
-                                target_area['y_min'] <= best_point[1] <= target_area['y_max']):
-                max_dist, best_point = curr_dist, (cx, cy)
+        
+        direct_dist = math.sqrt((cx-sx)**2 + (cy-sy)**2)
+        
+        
+        if is_forest_map:
+            if direct_dist > min_distance_required and is_good_door_spot(dmap, cx, cy):
+                if direct_dist > max_dist:
+                    max_dist, best_point = direct_dist, (cx, cy)
+                    if in_target:  
+                        min_distance_required = direct_dist  
+        else:
+            
+            if curr_dist > max_dist and is_good_door_spot(dmap, cx, cy):
+                if in_target or not (target_area['x_min'] <= best_point[0] <= target_area['x_max'] and
+                                   target_area['y_min'] <= best_point[1] <= target_area['y_max']):
+                    max_dist, best_point = curr_dist, (cx, cy)
         
         
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nx, ny = cx+dx, cy+dy
-            if (nx, ny) in closed_set or not (0 < nx < w-1 and 0 < ny < h-1) or dmap[ny][nx] not in [0, 4, 9]:
+            if (nx, ny) in closed_set or not (0 < nx < w-1 and 0 < ny < h-1):
+                continue
+            
+            
+            walkable = [0, 4, 9]
+            if is_forest_map:
+                walkable.append(2)  
+                
+            if dmap[ny][nx] not in walkable:
                 continue
             
             tent_g = g_scores[(cx, cy)] + 1
             if (nx, ny) not in g_scores or tent_g > g_scores[(nx, ny)]:
                 g_scores[(nx, ny)] = tent_g
                 heapq.heappush(open_set, (-tent_g, nx, ny))
+    
+    
+    if is_forest_map and math.sqrt((best_point[0]-sx)**2 + (best_point[1]-sy)**2) < min_distance_required:
+        
+        for attempt in range(100):  
+            test_x = random.randint(w//2, w-3)
+            test_y = random.randint(h//2, h-3)
+            if is_good_door_spot(dmap, test_x, test_y):
+                direct_dist = math.sqrt((test_x-sx)**2 + (test_y-sy)**2)
+                if direct_dist > min_distance_required:
+                    best_point = (test_x, test_y)
+                    break
     
     
     if not is_good_door_spot(dmap, best_point[0], best_point[1]):
@@ -403,18 +454,21 @@ def find_farthest_point(dmap, sx, sy):
 
 def is_good_door_spot(dmap, x, y):
     """Check if position is suitable for a door"""
+    if not (0 < x < len(dmap[0])-1 and 0 < y < len(dmap)-1):
+        return False
+        
     if dmap[y][x] not in [0, 4, 9]: return False
     
     
     wall_count = sum(1 for dy in range(-1, 2) for dx in range(-1, 2)
                     if 0 < y+dy < len(dmap)-1 and 0 < x+dx < len(dmap[0])-1 and 
-                    dmap[y+dy][x+dx] in [1, 8])
+                    dmap[y+dy][x+dx] in [1, 2, 5, 8])  
     
     empty_count = sum(1 for dy in range(-1, 2) for dx in range(-1, 2)
                      if 0 < y+dy < len(dmap)-1 and 0 < x+dx < len(dmap[0])-1 and 
                      dmap[y+dy][x+dx] in [0, 4, 9])
     
-    return wall_count >= 1 and wall_count <= 4 and empty_count >= 4
+    return wall_count >= 1 and wall_count <= 5 and empty_count >= 3
 
 def find_door_spot(dmap, x, y):
     """Find suitable door location near given point"""

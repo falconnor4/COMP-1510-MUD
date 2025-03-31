@@ -13,6 +13,7 @@ TERRAIN_TYPES = {
     'DOOR': '+',  
     'STAIRS': '≡',  
     'EMPTY': ' ',  
+    'BOSS_DOOR': 'B',  # New boss door terrain type
 }
 
 
@@ -28,6 +29,7 @@ TERRAIN_COLORS = {
     'DOOR': 5,  
     'STAIRS': 6,  
     'EMPTY': 0,  
+    'BOSS_DOOR': 1,  # Red color for boss door
 }
 
 
@@ -42,6 +44,7 @@ LEGEND = {
     7: 'STAIRS',
     8: 'STONE',
     9: 'SAND',
+    10: 'BOSS_DOOR',  # Boss door has ID 10
 }
 
 WORLD_MAP = [
@@ -80,6 +83,31 @@ WORLD_MAP_2 = [
     [8, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
     [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
     [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]
+]
+
+BOSS_ARENA = [
+    [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 8],
+    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
+    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
+    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
+    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
+    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
+    [8, 0, 0, 8, 8, 6, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]
 ]
 
 
@@ -146,7 +174,7 @@ ACTIVE_COLORS = generate_color_map(ACTIVE_MAP)
 
 
 
-def switch_map(map_id):
+def switch_map(map_id, player_level=1):
     """
     Switch the active map to a different map or generate a new dungeon
     Returns: (new_map, new_colors, player_spawn, is_new_dungeon)
@@ -154,6 +182,15 @@ def switch_map(map_id):
     global ACTIVE_MAP, ACTIVE_COLORS, CURRENT_MAP_TYPE, CURRENT_COLOR_SHIFT
     is_new_dungeon = False
     
+    # Special case for boss arena
+    if map_id == 'boss_arena':
+        ACTIVE_MAP = BOSS_ARENA
+        CURRENT_COLOR_SHIFT = 2  # Blue crypt-like color shift for boss arena
+        ACTIVE_COLORS = generate_color_map(ACTIVE_MAP, CURRENT_COLOR_SHIFT)
+        player_spawn = (5.5, 20.5)  # Place player in front of the entrance door
+        CURRENT_MAP_TYPE = 999  # Special identifier for boss arena
+        is_new_dungeon = True
+        return ACTIVE_MAP, ACTIVE_COLORS, player_spawn, is_new_dungeon
     
     if map_id != 1 and CURRENT_MAP_TYPE == 0:
         
@@ -280,6 +317,8 @@ def interact_raycast(player_x, player_y, player_angle, world_map):
         
         if cell_type == 6:  
             return 'door', int(test_x), int(test_y)
+        elif cell_type == 10:  # Boss door
+            return 'boss_door', int(test_x), int(test_y)
         elif cell_type == 7:  
             return 'stairs', int(test_x), int(test_y)
         
@@ -342,4 +381,4 @@ def get_terrain_at(x, y):
     if 0 <= y < len(ACTIVE_MAP) and 0 <= x < len(ACTIVE_MAP[0]):
         cell_type = ACTIVE_MAP[int(y)][int(x)]
         return LEGEND[cell_type]
-    return 'WALL'  
+    return 'WALL'
