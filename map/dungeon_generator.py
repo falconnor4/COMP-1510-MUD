@@ -62,6 +62,18 @@ ARCHETYPES = {
         'split_bias': 0.5,  
         'room_count': (8, 12),
         'color_shift': 4    
+    },
+    'BOSS_ARENA': {
+        'walls': 8,         
+        'special_walls': 1, 
+        'decor': [3],       
+        'floor': 0,         
+        'path': 4,          
+        'min_room': 8,      
+        'corridor_width': 2, 
+        'split_bias': 0.5,  
+        'room_count': (2, 3), 
+        'color_shift': 5    
     }
 }
 
@@ -517,3 +529,53 @@ def has_nearby_walls(dmap, x, y):
         for dx in range(-1, 2):
             if dmap[y+dy][x+dx] in [1, 8]: wall_count += 1
     return wall_count >= 3
+
+def generate_boss_arena(width=30, height=22):
+    """Generate a specialized arena for boss fights"""
+    
+    dungeon_map, _ = generate_dungeon(width, height, "BOSS_ARENA")
+    
+    
+    center_x, center_y = width // 2, height // 2
+    arena_radius = min(width, height) // 3
+    
+    
+    for y in range(center_y - arena_radius, center_y + arena_radius):
+        for x in range(center_x - arena_radius, center_x + arena_radius):
+            if 0 < y < height-1 and 0 < x < width-1:
+                dungeon_map[y][x] = 0  
+    
+    
+    for corner_y in [center_y - arena_radius + 2, center_y + arena_radius - 2]:
+        for corner_x in [center_x - arena_radius + 2, center_x + arena_radius - 2]:
+            if 0 < corner_y < height-1 and 0 < corner_x < width-1:
+                structure_size = random.randint(2, 3)
+                
+                for sy in range(corner_y - structure_size, corner_y + structure_size):
+                    for sx in range(corner_x - structure_size, corner_x + structure_size):
+                        if (0 < sy < height-1 and 0 < sx < width-1 and 
+                            random.random() < 0.6 and
+                            abs(sy - corner_y) + abs(sx - corner_x) <= structure_size):
+                            dungeon_map[sy][sx] = 8  
+    
+    
+    entrance_x = width // 2
+    entrance_y = height - 2
+    
+    
+    safe_radius = 3  
+    for y in range(entrance_y - safe_radius, entrance_y + 1):  
+        for x in range(entrance_x - safe_radius, entrance_x + safe_radius + 1):
+            if 0 < y < height-1 and 0 < x < width-1:
+                dungeon_map[y][x] = 0  
+    
+    
+    for x in range(width):
+        dungeon_map[0][x] = dungeon_map[height-1][x] = 8
+    for y in range(height):
+        dungeon_map[y][0] = dungeon_map[y][width-1] = 8
+    
+    
+    dungeon_map[entrance_y][entrance_x] = 0
+    
+    return dungeon_map, center_x, center_y, entrance_x, entrance_y

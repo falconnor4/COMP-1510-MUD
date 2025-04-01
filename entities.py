@@ -69,6 +69,38 @@ DEATH_ASCII = [
     ],
 ]
 
+BOSS_ASCII = [
+    "   ███████████   ",
+    " ███████████████ ",
+    "█████RUNTIME█████",
+    "█████OVERLORD████",
+    "███████████████ █",
+    "██  ███████  █  █",
+    "█ ██ ██████ ██ ██",
+    "█ ██ ██████ ██ ██",
+    "█    ███████    █",
+    "██████ERROR██████",
+    "███████████████ █",
+    "█ ████████████ ██",
+    " █ ██████████ ███",
+    "  █ ████████ ████",
+    "   █        █████",
+    "    ██████████   "
+]
+
+BOSS_DEATH_ASCII = [
+    "   ****  ****   ",
+    "  *   *  *   *  ",
+    " * CRITICAL ERROR",
+    " FATAL EXCEPTION *",
+    "*  STACK SMASH   *",
+    "* CORE DUMPED   * ",
+    " *   X    X    * ",
+    " *    ____    *  ",
+    "  *   ====   *   ",
+    "   **********    ",
+]
+
 ENEMY_COLOR = 1
 ENEMY_ALERT_COLOR = 5
 ENEMY_DEAD_COLOR = 8
@@ -181,6 +213,48 @@ def create_enemy(x, y, health=100):
     return enemy
 
 
+def create_boss(x, y):
+    """Create a boss entity at the given position"""
+    
+    boss = {
+        'type': ENTITY_ENEMY,  
+        'subtype': 'boss',     
+        'x': x,
+        'y': y,
+        'z': 0.5,
+        'health': 500,
+        'max_health': 500,
+        'state': 'idle',
+        'ascii': BOSS_ASCII,
+        'death_ascii': BOSS_DEATH_ASCII,
+        'width': len(BOSS_ASCII[0]),
+        'height': len(BOSS_ASCII),
+        'color': 1,
+        'last_move': time.time(),
+        'move_delay': 0.8,
+        'detection_range': 40.0,  
+        'attack_range': 8.0,
+        'distortion': 0.0,
+        'remove': False,
+        'last_state_change': time.time(),
+        'xp_value': 500,
+        'attack_cooldown': 2.0,
+        'last_attack': 0,
+        'attack_patterns': ['projectile', 'summon', 'charge'],
+        'current_pattern': 0,
+        'pattern_timer': time.time()
+    }
+
+    entities.append(boss)
+    enemies.append(boss)
+    
+    import ui
+    ui.add_message("RUNTIME OVERLORD has appeared!", 5.0, color=1)
+    ui.add_message("System stability compromised!", 5.0, color=1)
+
+    return boss
+
+
 def update_entities(delta_time, world_map, player_x, player_y, player_angle, player_state=None):
     """Update all entities in the world"""
     current_time = time.time()
@@ -256,16 +330,19 @@ def update_projectiles(delta_time, world_map, player_state=None, player_x=None, 
 
 
 def update_enemies(delta_time, world_map, player_x, player_y, player_angle):
-    """Update all enemies"""
+    """Update all enemies, including bosses with special handling"""
     current_time = time.time()
 
     for enemy in enemies:
-        if enemy['remove']:
+        if enemy['remove'] or enemy['state'] == 'dead':
             continue
 
-        if enemy['state'] == 'dead':
+        
+        if enemy.get('subtype') == 'boss':
+            update_boss_behavior(enemy, delta_time, world_map, player_x, player_y, player_angle, current_time)
             continue
 
+        
         dx = player_x - enemy['x']
         dy = player_y - enemy['y']
         dist_to_player = math.sqrt(dx * dx + dy * dy)
@@ -309,6 +386,74 @@ def update_enemies(delta_time, world_map, player_x, player_y, player_angle):
                     jitter_angle = angle_to_player + random.uniform(-0.5, 0.5)
                     jitter_dist = random.uniform(0.05, 0.2)
                     try_move_entity(enemy, jitter_angle, jitter_dist, world_map)
+
+
+def update_boss_behavior(boss, delta_time, world_map, player_x, player_y, player_angle, current_time):
+    """Handle boss-specific AI while reusing common enemy behavior"""
+    
+    dx = player_x - boss['x']
+    dy = player_y - boss['y']
+    dist_to_player = math.sqrt(dx * dx + dy * dy)
+    angle_to_player = math.atan2(dy, dx)
+    
+    
+    if current_time - boss.get('pattern_timer', 0) > 10.0:
+        boss['current_pattern'] = (boss['current_pattern'] + 1) % len(boss['attack_patterns'])
+        boss['pattern_timer'] = current_time
+        
+        import ui
+        pattern_name = boss['attack_patterns'][boss['current_pattern']].upper()
+        ui.add_message(f"RUNTIME OVERLORD: {pattern_name} PROTOCOL ENGAGED", 3.0, color=1)
+    
+    
+    if dist_to_player <= boss['detection_range'] and has_line_of_sight(boss['x'], boss['y'], player_x, player_y, world_map):
+        if dist_to_player <= boss['attack_range']:
+            boss['state'] = 'attack'
+        else:
+            boss['state'] = 'chase'
+    else:
+        boss['state'] = 'idle'
+    
+    
+    pattern = boss['attack_patterns'][boss['current_pattern']]
+    attack_cooldown = boss.get('attack_cooldown', 1.5)
+    
+    if boss['state'] == 'attack' and current_time - boss.get('last_attack', 0) > attack_cooldown:
+        if pattern == 'projectile':
+            for angle_offset in [-0.5, -0.25, 0, 0.25, 0.5]:
+                create_projectile(
+                    boss['x'], boss['y'],
+                    angle_to_player + angle_offset,
+                    speed=3.0, lifetime=2.0, damage=10
+                )
+            boss['last_attack'] = current_time
+        
+        elif pattern == 'summon':
+            for _ in range(2):
+                offset_x = random.uniform(-2.0, 2.0)
+                offset_y = random.uniform(-2.0, 2.0)
+                if not is_collision(boss['x'] + offset_x, boss['y'] + offset_y, world_map):
+                    create_enemy(boss['x'] + offset_x, boss['y'] + offset_y, health=50)
+            boss['last_attack'] = current_time
+        
+        elif pattern == 'charge':
+            charge_dist = min(dist_to_player * 0.5, 3.0)
+            try_move_entity(boss, angle_to_player, charge_dist, world_map)
+            boss['last_attack'] = current_time
+    
+    
+    if boss['state'] == 'chase' and current_time - boss.get('last_move', 0) > boss['move_delay']:
+        move_dist = 0.4 * delta_time * 10
+        try_move_entity(boss, angle_to_player, move_dist, world_map)
+        boss['last_move'] = current_time
+    
+    
+    elif boss['state'] == 'idle' and current_time - boss.get('last_move', 0) > boss['move_delay']:
+        if random.random() < 0.4:
+            move_angle = random.uniform(0, 2 * math.pi)
+            move_dist = random.uniform(0.2, 0.8)
+            try_move_entity(boss, move_angle, move_dist, world_map)
+        boss['last_move'] = current_time
 
 
 def try_move_entity(entity, angle, distance, world_map):

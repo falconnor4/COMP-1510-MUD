@@ -13,7 +13,7 @@ TERRAIN_TYPES = {
     'DOOR': '+',  
     'STAIRS': '≡',  
     'EMPTY': ' ',  
-    'BOSS_DOOR': 'B',  # New boss door terrain type
+    'BOSS_DOOR': 'B',  
 }
 
 
@@ -29,7 +29,7 @@ TERRAIN_COLORS = {
     'DOOR': 5,  
     'STAIRS': 6,  
     'EMPTY': 0,  
-    'BOSS_DOOR': 1,  # Red color for boss door
+    'BOSS_DOOR': 1,  
 }
 
 
@@ -44,7 +44,7 @@ LEGEND = {
     7: 'STAIRS',
     8: 'STONE',
     9: 'SAND',
-    10: 'BOSS_DOOR',  # Boss door has ID 10
+    10: 'BOSS_DOOR',  
 }
 
 WORLD_MAP = [
@@ -85,32 +85,6 @@ WORLD_MAP_2 = [
     [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]
 ]
 
-BOSS_ARENA = [
-    [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 8],
-    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
-    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
-    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
-    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
-    [8, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 8],
-    [8, 0, 0, 8, 8, 6, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 0, 0, 0, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
-    [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]
-]
-
-
 ACTIVE_MAP = WORLD_MAP
 
 CURRENT_MAP_TYPE = 0
@@ -149,6 +123,13 @@ def generate_color_map(world_map=None, color_shift=0):
             'EMPTY': 8,
             'PATH': 6,
             'WATER': 4
+        },
+        5: {    
+            'WALL': 7,
+            'STONE': 7,
+            'EMPTY': 7,
+            'PATH': 7,
+            'WATER': 6
         }
     }
     
@@ -182,13 +163,19 @@ def switch_map(map_id, player_level=1):
     global ACTIVE_MAP, ACTIVE_COLORS, CURRENT_MAP_TYPE, CURRENT_COLOR_SHIFT
     is_new_dungeon = False
     
-    # Special case for boss arena
+    
     if map_id == 'boss_arena':
-        ACTIVE_MAP = BOSS_ARENA
-        CURRENT_COLOR_SHIFT = 2  # Blue crypt-like color shift for boss arena
+        from map.dungeon_generator import generate_boss_arena
+        boss_map, center_x, center_y, entrance_x, entrance_y = generate_boss_arena()
+        ACTIVE_MAP = boss_map
+        
+        
+        CURRENT_COLOR_SHIFT = 5  
         ACTIVE_COLORS = generate_color_map(ACTIVE_MAP, CURRENT_COLOR_SHIFT)
-        player_spawn = (5.5, 20.5)  # Place player in front of the entrance door
-        CURRENT_MAP_TYPE = 999  # Special identifier for boss arena
+        
+        
+        player_spawn = (entrance_x + 0.5, entrance_y + 0.5)
+        CURRENT_MAP_TYPE = 999  
         is_new_dungeon = True
         return ACTIVE_MAP, ACTIVE_COLORS, player_spawn, is_new_dungeon
     
@@ -251,7 +238,64 @@ def switch_map(map_id, player_level=1):
         player_spawn = (10.5, 8.5)  
         CURRENT_MAP_TYPE = 0  
     
+    
+    if is_new_dungeon and player_level >= 3:
+        
+        door_x, door_y = find_door_position(ACTIVE_MAP)
+        if door_x is not None:
+            
+            placed = False
+            for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                new_x, new_y = door_x + dx, door_y + dy
+                if (is_valid_boss_door_location(ACTIVE_MAP, new_x, new_y)):
+                    ACTIVE_MAP[new_y][new_x] = 10  
+                    placed = True
+                    break
+            
+            
+            if not placed:
+                boss_door_pos = find_nearby_empty_space(ACTIVE_MAP, door_x, door_y)
+                if boss_door_pos:
+                    ACTIVE_MAP[boss_door_pos[1]][boss_door_pos[0]] = 10
+    
     return ACTIVE_MAP, ACTIVE_COLORS, player_spawn, is_new_dungeon
+
+def find_door_position(world_map):
+    """Find the position of the main door in the map"""
+    for y in range(len(world_map)):
+        for x in range(len(world_map[0])):
+            if world_map[y][x] == 6:  
+                return x, y
+    return None, None
+
+def is_valid_boss_door_location(world_map, x, y):
+    """Check if a position is valid for placing a boss door"""
+    if not (0 < x < len(world_map[0])-1 and 0 < y < len(world_map)-1):
+        return False
+    return world_map[y][x] == 0  
+
+def find_nearby_empty_space(world_map, start_x, start_y, max_distance=5):
+    """Find a nearby empty space for placing a boss door"""
+    queue = [(start_x, start_y, 0)]  
+    visited = {(start_x, start_y)}
+    
+    while queue:
+        x, y, dist = queue.pop(0)
+        if dist > max_distance:
+            continue
+            
+        if world_map[y][x] == 0:  
+            return x, y
+            
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nx, ny = x + dx, y + dy
+            if ((nx, ny) not in visited and 
+                0 < nx < len(world_map[0])-1 and 
+                0 < ny < len(world_map)-1):
+                visited.add((nx, ny))
+                queue.append((nx, ny, dist + 1))
+                
+    return None
 
 
 def is_spawn_valid(x, y, current_map):
@@ -317,7 +361,7 @@ def interact_raycast(player_x, player_y, player_angle, world_map):
         
         if cell_type == 6:  
             return 'door', int(test_x), int(test_y)
-        elif cell_type == 10:  # Boss door
+        elif cell_type == 10:  
             return 'boss_door', int(test_x), int(test_y)
         elif cell_type == 7:  
             return 'stairs', int(test_x), int(test_y)
