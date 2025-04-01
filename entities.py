@@ -1,6 +1,7 @@
 import math
 import random
 import time
+from utils.collision import is_collision
 
 entities = []
 projectiles = []
@@ -495,17 +496,6 @@ def clear_entities():
     entities = []
     projectiles = []
     enemies = []
-
-
-def is_collision(x, y, world_map):
-    """Check if a position collides with a wall"""
-    grid_x, grid_y = int(x), int(y)
-
-    if grid_y < 0 or grid_y >= len(world_map) or grid_x < 0 or grid_x >= len(world_map[0]):
-        return True
-
-    walkable_types = [0, 4, 9]
-    return world_map[grid_y][grid_x] not in walkable_types
 
 
 def has_line_of_sight(x1, y1, x2, y2, world_map):

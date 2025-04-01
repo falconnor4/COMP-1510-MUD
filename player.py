@@ -2,6 +2,7 @@ import math
 import curses
 import time
 from debug import toggle_console, process_input, DEBUG_CONSOLE
+from utils.collision import is_collision, would_collide
 
 
 def create_player(x=1.5, y=1.5, angle=0.0):
@@ -212,36 +213,3 @@ def update_head_bob(player_state, delta_time, speed):
         else:
             player_state['bob_offset'] = 0
             player_state['bob_phase'] = 0
-
-
-def is_collision(x, y, world_map):
-    """Check if the player would collide with a wall"""
-    grid_x = int(x)
-    grid_y = int(y)
-
-    if grid_y < 0 or grid_y >= len(world_map) or grid_x < 0 or grid_x >= len(world_map[0]):
-        return True
-
-    walkable_types = [0, 4, 9]
-    if world_map[grid_y][grid_x] not in walkable_types:
-        return True
-
-    return False
-
-
-def would_collide(x, y, new_x, new_y, world_map):
-    """Advanced collision check with buffer zone"""
-
-    if is_collision(new_x, new_y, world_map):
-        return True
-
-    steps = 3
-    for i in range(1, steps):
-
-        check_x = x + (new_x - x) * i / steps
-        check_y = y + (new_y - y) * i / steps
-
-        if is_collision(check_x, check_y, world_map):
-            return True
-
-    return False

@@ -47,6 +47,21 @@ LEGEND = {
     10: 'BOSS_DOOR',  
 }
 
+# Add centralized terrain character mapping
+TERRAIN_CHARS = {
+    0: ' ',  # EMPTY
+    1: '#',  # WALL
+    2: '♣',  # TREE
+    3: '~',  # WATER
+    4: '·',  # PATH
+    5: '▲',  # MOUNTAIN
+    6: '+',  # DOOR
+    7: '≡',  # STAIRS
+    8: '▓',  # STONE
+    9: ':',  # SAND
+    10: 'B', # BOSS_DOOR
+}
+
 WORLD_MAP = [
     [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
     [8, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 8],

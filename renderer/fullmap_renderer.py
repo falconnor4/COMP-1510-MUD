@@ -1,5 +1,6 @@
 import curses
 import math
+from map import TERRAIN_CHARS
 
 
 def render_full_map(stdscr, player_x, player_y, player_angle, world_map, world_colors):
@@ -31,18 +32,8 @@ def render_full_map(stdscr, player_x, player_y, player_angle, world_map, world_c
     stdscr.addstr(1, title_x, title)
     stdscr.attroff(curses.color_pair(3) | curses.A_BOLD)
 
-    terrain_chars = {
-        0: ' ',
-        1: '#',
-        2: '♣',
-        3: '~',
-        4: '·',
-        5: '▲',
-        6: '+',
-        7: '≡',
-        8: '▓',
-        9: ':',
-    }
+    # Use imported terrain characters
+    terrain_chars = TERRAIN_CHARS
 
     for y in range(map_height):
 

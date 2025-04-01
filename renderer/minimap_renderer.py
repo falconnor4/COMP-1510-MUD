@@ -1,5 +1,6 @@
 import curses
 import math
+from map import TERRAIN_CHARS
 
 
 def render_minimap(stdscr, player_x, player_y, player_angle, world_map, world_colors, height, width):
@@ -38,18 +39,8 @@ def render_minimap(stdscr, player_x, player_y, player_angle, world_map, world_co
     end_x = min(len(world_map[0]), center_x + view_radius + 1)
     end_y = min(len(world_map), center_y + view_radius + 1)
 
-    terrain_chars = {
-        0: ' ',
-        1: '#',
-        2: '♣',
-        3: '~',
-        4: '·',
-        5: '▲',
-        6: '+',
-        7: '≡',
-        8: '▓',
-        9: ':',
-    }
+    # Use imported terrain characters
+    terrain_chars = TERRAIN_CHARS
 
     for map_y in range(start_y, end_y):
         for map_x in range(start_x, end_x):
