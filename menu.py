@@ -1,6 +1,6 @@
 import curses
 import time
-from renderer.color_utils import init_colors  # Import the central color function
+from renderer.color_utils import init_colors
 
 TITLE_ART = [
     r"                                                                                                    ",
@@ -20,12 +20,7 @@ TITLE_ART = [
     r"Version: -0.1                  A small(ish) 3d adventure game in the terminal!                      ",
 ]
 
-MENU_OPTIONS = [
-    "Start Game",
-    "Instructions",
-    "Credits",
-    "Exit"
-]
+MENU_OPTIONS = ["Start Game", "Instructions", "Credits", "Exit"]
 
 
 def draw_title(stdscr, start_y):
@@ -40,6 +35,25 @@ def draw_title(stdscr, start_y):
         stdscr.attron(curses.color_pair(color) | curses.A_BOLD)
         stdscr.addstr(start_y + i, title_x, line)
         stdscr.attroff(curses.color_pair(color) | curses.A_BOLD)
+
+
+def draw_footer(stdscr, footer_text):
+    """
+    Draw a centered footer at the bottom of the screen
+
+    Args:
+        stdscr: The curses window
+        footer_text: The text to display in the footer
+    """
+    height, width = stdscr.getmaxyx()
+    footer_y = height - 2
+    footer_x = max(0, (width - len(footer_text)) // 2)
+
+    stdscr.attron(curses.color_pair(3))
+    stdscr.addstr(footer_y, footer_x, footer_text)
+    stdscr.attroff(curses.color_pair(3))
+
+    stdscr.refresh()
 
 
 def draw_menu(stdscr, selected_idx):
@@ -68,41 +82,61 @@ def draw_menu(stdscr, selected_idx):
         if i == selected_idx:
 
             stdscr.attron(curses.color_pair(2) | curses.A_BOLD)
-            stdscr.addstr(y, x, '>' + ' ' + option + ' ' + '<')
+            stdscr.addstr(y, x, ">" + " " + option + " " + "<")
             stdscr.attroff(curses.color_pair(2) | curses.A_BOLD)
         else:
             stdscr.attron(curses.color_pair(7))
-            stdscr.addstr(y, x, '  ' + option + '  ')
+            stdscr.addstr(y, x, "  " + option + "  ")
             stdscr.attroff(curses.color_pair(7))
 
-    footer = "Use UP/DOWN arrows to select, ENTER to confirm"
-    footer_y = height - 2
-    footer_x = max(0, (width - len(footer)) // 2)
-    stdscr.attron(curses.color_pair(3))
-    stdscr.addstr(footer_y, footer_x, footer)
-    stdscr.attroff(curses.color_pair(3))
-
-    stdscr.refresh()
+    draw_footer(stdscr, "Use UP/DOWN arrows to select, ENTER to confirm")
 
 
-def show_instructions(stdscr):
-    """Display game instructions"""
+def display_screen(stdscr, title, content, line_styles=None):
+    """
+    Display a screen with a title, content, and footer
+
+    Args:
+        stdscr: The curses window
+        title: The title to display at the top
+        content: List of strings to display as content
+        line_styles: Optional function to determine style for each line
+    """
     stdscr.clear()
-
     height, width = stdscr.getmaxyx()
 
+    # Draw border
     border_style = curses.color_pair(6) | curses.A_BOLD
     stdscr.attron(border_style)
     stdscr.box()
     stdscr.attroff(border_style)
 
-    title = "INSTRUCTIONS"
+    # Draw title
     title_y = 2
     title_x = max(0, (width - len(title)) // 2)
     stdscr.attron(curses.color_pair(3) | curses.A_BOLD)
     stdscr.addstr(title_y, title_x, title)
     stdscr.attroff(curses.color_pair(3) | curses.A_BOLD)
 
+    # Draw content
+    content_y = 5
+    for i, line in enumerate(content):
+        if not line:
+            continue
+
+        style = line_styles(i, line) if line_styles else curses.color_pair(7)
+
+        content_x = max(0, (width - len(line)) // 2)
+        stdscr.attron(style)
+        stdscr.addstr(content_y + i, content_x, line)
+        stdscr.attroff(style)
+
+    draw_footer(stdscr, "Press any key to return to the menu")
+    stdscr.getch()
+
+
+def show_instructions(stdscr):
+    """Display game instructions"""
     instructions = [
         "MOVEMENT CONTROLS:",
         "  W - Move Forward",
@@ -124,53 +158,25 @@ def show_instructions(stdscr):
         "  '~' - Water      '·' - Path",
         "  '▲' - Mountain   '+' - Door",
         "  '≡' - Stairs     '▓' - Stone",
-        "  ':' - Sand       ' ' - Empty"
+        "  ':' - Sand       ' ' - Empty",
     ]
 
-    instruction_y = 5
-    for i, line in enumerate(instructions):
-        if not line:
-            continue
-
-        if "CONTROLS:" in line or "TURNING:" in line or "ACTIONS:" in line or "TERRAIN TYPES:" in line:
-            style = curses.color_pair(1) | curses.A_BOLD
+    def instruction_styles(line):
+        if (
+            "CONTROLS:" in line
+            or "TURNING:" in line
+            or "ACTIONS:" in line
+            or "TERRAIN TYPES:" in line
+        ):
+            return curses.color_pair(1) | curses.A_BOLD
         else:
-            style = curses.color_pair(7)
+            return curses.color_pair(7)
 
-        instruction_x = max(0, (width - len(line)) // 2)
-        stdscr.attron(style)
-        stdscr.addstr(instruction_y + i, instruction_x, line)
-        stdscr.attroff(style)
-
-    footer = "Press any key to return to the menu"
-    footer_y = height - 2
-    footer_x = max(0, (width - len(footer)) // 2)
-    stdscr.attron(curses.color_pair(3))
-    stdscr.addstr(footer_y, footer_x, footer)
-    stdscr.attroff(curses.color_pair(3))
-
-    stdscr.refresh()
-    stdscr.getch()
+    display_screen(stdscr, "INSTRUCTIONS", instructions, instruction_styles)
 
 
 def show_credits(stdscr):
     """Display game credits"""
-    stdscr.clear()
-
-    height, width = stdscr.getmaxyx()
-
-    border_style = curses.color_pair(6) | curses.A_BOLD
-    stdscr.attron(border_style)
-    stdscr.box()
-    stdscr.attroff(border_style)
-
-    title = "CREDITS"
-    title_y = 2
-    title_x = max(0, (width - len(title)) // 2)
-    stdscr.attron(curses.color_pair(3) | curses.A_BOLD)
-    stdscr.addstr(title_y, title_x, title)
-    stdscr.attroff(curses.color_pair(3) | curses.A_BOLD)
-
     credits = [
         "COMP-1510-MUD",
         "",
@@ -187,35 +193,18 @@ def show_credits(stdscr):
         "Special thanks to:",
         "  The Python Community",
         "  The Curses Library",
-        "  BCIT"
+        "  BCIT",
     ]
 
-    credits_y = 5
-    for i, line in enumerate(credits):
-        if not line:
-            continue
-
+    def credit_styles(i, line):
         if i == 0:
-            style = curses.color_pair(1) | curses.A_BOLD
+            return curses.color_pair(1) | curses.A_BOLD
         elif line.startswith("  "):
-            style = curses.color_pair(7)
+            return curses.color_pair(7)
         else:
-            style = curses.color_pair(6) | curses.A_BOLD
+            return curses.color_pair(6) | curses.A_BOLD
 
-        credit_x = max(0, (width - len(line)) // 2)
-        stdscr.attron(style)
-        stdscr.addstr(credits_y + i, credit_x, line)
-        stdscr.attroff(style)
-
-    footer = "Press any key to return to the menu"
-    footer_y = height - 2
-    footer_x = max(0, (width - len(footer)) // 2)
-    stdscr.attron(curses.color_pair(3))
-    stdscr.addstr(footer_y, footer_x, footer)
-    stdscr.attroff(curses.color_pair(3))
-
-    stdscr.refresh()
-    stdscr.getch()
+    display_screen(stdscr, "CREDITS", credits, credit_styles)
 
 
 def display_menu(stdscr):

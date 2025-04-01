@@ -21,3 +21,21 @@ def get_color_pair(color_code):
         return curses.color_pair(int(color_code))
     except:
         return curses.color_pair(7)
+
+
+def get_cell_style(cell_type, cell_color):
+    """Get the appropriate style for a cell based on its type and color"""
+    if cell_type in [1, 8]:  # Wall, Stone
+        return curses.color_pair(cell_color) | curses.A_BOLD
+    elif cell_type == 3:  # Water
+        return curses.color_pair(4) | curses.A_BOLD
+    elif cell_type == 2:  # Tree
+        return curses.color_pair(2) | curses.A_BOLD
+    elif cell_type == 4:  # Path
+        return curses.color_pair(3)
+    elif cell_type == 5:  # Mountain
+        return curses.color_pair(7) | curses.A_BOLD
+    elif cell_type == 9:  # Sand
+        return curses.color_pair(3) | curses.A_DIM
+    else:
+        return curses.color_pair(cell_color)
