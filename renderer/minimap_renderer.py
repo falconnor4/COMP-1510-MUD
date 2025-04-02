@@ -1,6 +1,7 @@
 import curses
 import math
 from map import TERRAIN_CHARS
+from renderer.color_utils import get_cell_style
 
 
 def render_minimap(stdscr, player_x, player_y, player_angle, world_map, world_colors, height, width):
@@ -54,20 +55,7 @@ def render_minimap(stdscr, player_x, player_y, player_angle, world_map, world_co
 
                 cell_char = terrain_chars.get(cell_type, '?')
 
-                if cell_type in [1, 8]:
-                    style = curses.color_pair(cell_color) | curses.A_BOLD
-                elif cell_type == 3:
-                    style = curses.color_pair(4) | curses.A_BOLD
-                elif cell_type == 2:
-                    style = curses.color_pair(2) | curses.A_BOLD
-                elif cell_type == 4:
-                    style = curses.color_pair(3)
-                elif cell_type == 5:
-                    style = curses.color_pair(7) | curses.A_BOLD
-                elif cell_type == 9:
-                    style = curses.color_pair(3) | curses.A_DIM
-                else:
-                    style = curses.color_pair(cell_color)
+                style = get_cell_style(cell_type, cell_color)
 
                 try:
                     stdscr.addch(mini_y, mini_x, cell_char, style)

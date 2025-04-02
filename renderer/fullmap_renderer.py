@@ -1,6 +1,7 @@
 import curses
 import math
 from map import TERRAIN_CHARS
+from renderer.color_utils import get_cell_style
 
 
 def render_full_map(stdscr, player_x, player_y, player_angle, world_map, world_colors):
@@ -53,20 +54,7 @@ def render_full_map(stdscr, player_x, player_y, player_angle, world_map, world_c
 
             cell_color = int(world_colors[y][x])
 
-            if cell_type in [1, 8]:
-                style = curses.color_pair(cell_color) | curses.A_BOLD
-            elif cell_type == 3:
-                style = curses.color_pair(4) | curses.A_BOLD
-            elif cell_type == 2:
-                style = curses.color_pair(2) | curses.A_BOLD
-            elif cell_type == 4:
-                style = curses.color_pair(3)
-            elif cell_type == 5:
-                style = curses.color_pair(7) | curses.A_BOLD
-            elif cell_type == 9:
-                style = curses.color_pair(3) | curses.A_DIM
-            else:
-                style = curses.color_pair(cell_color)
+            style = get_cell_style(cell_type, cell_color)
 
             if 0 <= screen_y < height and 0 <= screen_x < width:
                 try:
