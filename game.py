@@ -25,10 +25,7 @@ def run_game(stdscr):
     stdscr.clear()
     init_colors()
 
-    # Create player state
     player_state = create_player(x=10.5, y=8.5)
-
-    # Game loop variables
     running = True
     last_frame_time = time.time()
 
@@ -39,12 +36,11 @@ def run_game(stdscr):
     # Initialize entities
     entities.spawn_enemies(current_map, 5)  # Spawn 5 enemies
 
-    # Setup debug commands
-    def change_level():
-        """Debug command to change level"""
+    def _handle_level_change(level_id):
+        """Handles the logic for changing levels/maps."""
         nonlocal current_map, current_colors
         new_map, new_colors, player_spawn, is_new_dungeon = switch_map(
-            2 if current_map == ACTIVE_MAP else 1
+            level_id, player_state["level"]
         )
         current_map = new_map
         current_colors = new_colors
@@ -55,7 +51,6 @@ def run_game(stdscr):
         # Track stage descent if entering a new dungeon level
         if is_new_dungeon:
             player_state["stages_descended"] += 1
-            # Show dungeon type message
             from map.static_map import CURRENT_COLOR_SHIFT
 
             dungeon_types = {
@@ -67,7 +62,7 @@ def run_game(stdscr):
             }
             dungeon_type = dungeon_types.get(CURRENT_COLOR_SHIFT, "Strange Area")
             ui.add_message(
-                f"DEBUG: Entered {dungeon_type} - Depth {player_state['stages_descended']}",
+                f"Entered {dungeon_type} - Depth {player_state['stages_descended']}",
                 3.5,
                 color=5,
             )
@@ -79,7 +74,12 @@ def run_game(stdscr):
 
         return f"Changed to level {player_state['stages_descended']}"
 
-    # Initialize debug commands with player state and level change function
+    # Setup debug commands
+    def change_level():
+        """Debug command to change level"""
+        level_to_switch = 2 if current_map == ACTIVE_MAP else 1
+        return _handle_level_change(level_to_switch)
+
     debug.COMMANDS["next"]["callback"] = change_level
     debug.initialize_commands(player_state, change_level)
 
@@ -103,7 +103,6 @@ def run_game(stdscr):
             if quit_pressed:
                 running = False
 
-        # Update player based on current active keys
         if not player_state["map_mode"] and not debug.DEBUG_CONSOLE["active"]:
             should_shoot, should_interact = update_player(
                 player_state, delta_time, current_map
@@ -115,15 +114,11 @@ def run_game(stdscr):
                 and current_time - player_state["last_shot_time"]
                 > player_state["shot_cooldown"]
             ):
-                # Get screen dimensions for muzzle position calculation
                 height, width = stdscr.getmaxyx()
 
                 # Create a closure that captures the current player state and screen dimensions
                 def create_delayed_projectile():
-                    # Get the muzzle position in screen coordinates
                     muzzle_pos = ui.get_weapon_muzzle_position(height, width)
-
-                    # Convert screen position to world position
                     world_x, world_y = ui.convert_screen_to_world(
                         muzzle_pos,
                         player_state["x"],
@@ -143,14 +138,14 @@ def run_game(stdscr):
                 player_state["last_shot_time"] = current_time
                 ui.add_status_effect("Shot fired", "!", duration=1.0, color=1)
 
-            # Update entities with player state for XP awards
+            # Update entities with player state for XP
             entities.update_entities(
                 delta_time,
                 current_map,
                 player_state["x"],
                 player_state["y"],
                 player_state["angle"],
-                player_state,  # Pass player_state to entities for XP awards
+                player_state,
             )
 
             # Handle interaction
@@ -164,48 +159,8 @@ def run_game(stdscr):
                 )
 
                 if object_type == "door":
-                    # Generate a new dungeon level and update map/colors
-                    new_map, new_colors, player_spawn, is_new_dungeon = switch_map(
-                        2 if current_map == ACTIVE_MAP else 1, player_state["level"]
-                    )
-                    current_map = new_map
-                    current_colors = new_colors
-
-                    # Move player to spawn point
-                    player_state["x"], player_state["y"] = player_spawn
-
-                    # Track stage descent if entering a new dungeon level
-                    if is_new_dungeon:
-                        player_state["stages_descended"] += 1
-
-                        # Determine dungeon type from static_map's CURRENT_COLOR_SHIFT
-                        from map.static_map import CURRENT_COLOR_SHIFT
-
-                        dungeon_types = {
-                            0: "Cave",
-                            1: "Ancient Ruins",
-                            2: "Forgotten Crypt",
-                            3: "Overgrown Forest",
-                            4: "Abandoned Tech Facility",
-                        }
-                        dungeon_type = dungeon_types.get(
-                            CURRENT_COLOR_SHIFT, "Strange Area"
-                        )
-
-                        # Show dungeon type message
-                        ui.add_message(
-                            f"Entered {dungeon_type} - Depth {player_state['stages_descended']}",
-                            3.5,
-                            color=5,
-                        )
-
-                    # Update enemies for the new level - respawn with increased difficulty based on depth
-                    entities.clear_entities()
-                    enemy_count = (
-                        5 + player_state["stages_descended"] // 2
-                    )  # Increase enemy count with depth
-                    entities.spawn_enemies(current_map, enemy_count)
-
+                    level_to_switch = 2 if current_map == ACTIVE_MAP else 1
+                    _handle_level_change(level_to_switch)
                     ui.add_message(
                         f"You descended to dungeon depth {player_state['stages_descended']}...",
                         3.0,
@@ -223,9 +178,7 @@ def run_game(stdscr):
                     
                     # Block the entrance behind the player (no way out)
                     entrance_x, entrance_y = int(player_spawn[0]), int(player_spawn[1])
-                    
-                    # Place wall segments 2 tiles behind the player (not on player's position)
-                    wall_y = entrance_y + 2  # Place walls 2 tiles below player instead of 1
+                    wall_y = entrance_y + 2
                     for offset_x in range(-2, 3):
                         try:
                             # Make sure we're not placing walls on the player's position
