@@ -94,6 +94,46 @@ def update_animation():
     return True
 
 
+def display_game_over(stdscr, player_state):
+    """Display the game over screen with player stats."""
+    stdscr.clear()
+    height, width = stdscr.getmaxyx()
+
+    stdscr.attron(curses.color_pair(1) | curses.A_BOLD)
+    stdscr.box()
+    stdscr.attroff(curses.color_pair(1) | curses.A_BOLD)
+
+    title = "G A M E   O V E R"
+    title_x = max(0, (width - len(title)) // 2)
+    stdscr.attron(curses.color_pair(1) | curses.A_BOLD)
+    stdscr.addstr(height // 2 - 5, title_x, title)
+    stdscr.attroff(curses.color_pair(1) | curses.A_BOLD)
+
+    stats = [
+        f"Final Level: {player_state.get('level', 1)}",
+        f"Depth Reached: {player_state.get('stages_descended', 0)}",
+        f"Enemies Defeated: {player_state.get('kills', 0)}",
+    ]
+
+    stats_y = height // 2 - 2
+    for i, stat in enumerate(stats):
+        stat_x = max(0, (width - len(stat)) // 2)
+        stdscr.attron(curses.color_pair(7))
+        stdscr.addstr(stats_y + i, stat_x, stat)
+        stdscr.attroff(curses.color_pair(7))
+
+    footer_text = "Press any key to return to the menu"
+    footer_x = max(0, (width - len(footer_text)) // 2)
+    stdscr.attron(curses.color_pair(3))
+    stdscr.addstr(height - 3, footer_x, footer_text)
+    stdscr.attroff(curses.color_pair(3))
+
+    stdscr.refresh()
+    stdscr.nodelay(False)
+    stdscr.getch()
+    stdscr.nodelay(True)
+
+
 def clear_expired_elements(current_time):
     """Remove any UI elements that have expired"""
     global ui_elements

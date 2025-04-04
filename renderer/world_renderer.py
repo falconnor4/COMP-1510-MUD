@@ -95,6 +95,108 @@ def shoot_animation(stdscr, height, width):
         return None
 
 
+def _render_pattern_entity(
+    stdscr,
+    entity,
+    screen_x,
+    screen_y,
+    entity_height,
+    entity_distance,
+    wall_segments,
+    height,
+    width,
+):
+    """Helper function to render entities with ASCII patterns (projectiles)."""
+    if "pattern" not in entity:
+        return
+
+    pattern = entity["pattern"]
+    pattern_height, pattern_width = len(pattern), (
+        len(pattern[0]) if len(pattern) > 0 else 0
+    )
+    if pattern_height == 0 or pattern_width == 0:
+        return
+
+    if entity["type"] == entity_system.ENTITY_PROJECTILE:
+        size_scale = min(1.0, 1.5 / max(1.0, entity_distance * 0.3))
+        start_y_offset = 0
+    elif entity["type"] == entity_system.ENTITY_ENEMY_PROJECTILE:
+        size_scale = min(1.0, 2.0 / max(1.0, entity_distance * 0.4))
+        start_y_offset = entity_height // 2
+    else:
+        size_scale = 1.0
+        start_y_offset = 0
+
+    draw_height, draw_width = max(1, int(pattern_height * size_scale)), max(
+        1, int(pattern_width * size_scale)
+    )
+
+    start_x, start_y = (
+        screen_x - draw_width // 2,
+        screen_y - draw_height // 2 + start_y_offset,
+    )
+
+    pulse_factor = (
+        0.7
+        + 0.3
+        * math.sin(
+            (time.time() - entity["creation_time"])
+            * entity.get("pulse_rate", 5.0)
+            * 2
+            * math.pi
+        )
+        if entity.get("glow", False)
+        else 1.0
+    )
+
+    brightness = min(1.0, pulse_factor / max(0.5, entity_distance * 0.1))
+
+    color_attr = curses.color_pair(entity["color"])
+    if brightness > 0.8:
+        color_attr |= curses.A_BOLD
+    elif brightness <= 0.4:
+        color_attr |= curses.A_DIM
+
+    for local_y in range(draw_height):
+        pattern_y = min(
+            pattern_height - 1, int(local_y / draw_height * pattern_height)
+        )
+        screen_pos_y = start_y + local_y
+
+        if not (0 <= screen_pos_y < height):
+            continue
+
+        for local_x in range(draw_width):
+            pattern_x = min(
+                pattern_width - 1, int(local_x / draw_width * pattern_width)
+            )
+            screen_pos_x = start_x + local_x
+
+            if not (0 <= screen_pos_x < width):
+                continue
+
+            is_occluded = False
+            for segment in wall_segments:
+                if (
+                    segment["column"] == screen_pos_x
+                    and segment["distance"] < entity_distance
+                ):
+                    is_occluded = True
+                    break
+
+            if (
+                not is_occluded
+                and pattern_y < len(pattern)
+                and pattern_x < len(pattern[pattern_y])
+            ):
+                char = pattern[pattern_y][pattern_x]
+                if char != " ":
+                    try:
+                        stdscr.addch(screen_pos_y, screen_pos_x, char, color_attr)
+                    except curses.error:
+                        pass
+
+
 def render_world(
     stdscr, player_x, player_y, player_angle, world_map, world_colors, player_state=None
 ):
@@ -173,7 +275,7 @@ def render_world(
                     )
 
         distance_to_wall *= math.cos(ray_offset)
-        wall_height = min(height, int(height / distance_to_wall * 2))
+        wall_height = min(height, int(height / distance_to_wall * 2)) if distance_to_wall > 0 else height
         bob_pixels = int(eye_height_offset * height / 4)
 
         wall_top = max(0, height // 2 - wall_height // 2 + bob_pixels)
@@ -198,7 +300,7 @@ def render_world(
         dy = entity["y"] - player_y
         entity_distance = math.sqrt(dx * dx + dy * dy)
 
-        if entity_distance > 20.0:
+        if entity_distance > 20.0 or entity_distance <= 0:
             continue
 
         entity_angle = math.atan2(dy, dx)
@@ -272,49 +374,30 @@ def render_world(
 
         color_attr = get_color_pair(current_color)
         if distance_to_wall > 10:
-            color_attr = color_attr | curses.A_DIM
+            color_attr |= curses.A_DIM
         elif distance_to_wall < 3:
-            color_attr = color_attr | curses.A_BOLD
+            color_attr |= curses.A_BOLD
 
         if wall_orientation == "horizontal" and distance_to_wall < 20:
-            shade_char = get_shading_set("horizontal")[
-                min(
-                    len(get_shading_set("horizontal")) - 1,
-                    get_shading_set().find(shade_char),
-                )
-            ]
-            color_attr = color_attr | curses.A_DIM
+            horizontal_shades = get_shading_set("horizontal")
+            shade_index = SHADING_CHARS.find(shade_char)
+            if shade_index != -1:
+                 shade_char = horizontal_shades[min(len(horizontal_shades) - 1, shade_index)]
+            color_attr |= curses.A_DIM
 
         for y in range(wall_top, wall_bottom + 1):
             try:
                 position_in_wall = (y - wall_top) / max(1, wall_bottom - wall_top)
 
-                char = (
-                    WALL_EDGE_CHARS["top"]
-                    if y == wall_top
-                    else (
-                        WALL_EDGE_CHARS["bottom"]
-                        if y == wall_bottom
-                        else (
-                            WALL_EDGE_CHARS["left"]
-                            if is_left_edge and y > wall_top and y < wall_bottom
-                            else (
-                                WALL_EDGE_CHARS["right"]
-                                if is_right_edge and y > wall_top and y < wall_bottom
-                                else (
-                                    SHADING_CHARS[
-                                        min(
-                                            len(SHADING_CHARS) - 1,
-                                            SHADING_CHARS.find(shade_char) + 1,
-                                        )
-                                    ]
-                                    if position_in_wall > 0.8
-                                    else shade_char
-                                )
-                            )
-                        )
-                    )
-                )
+                char = shade_char
+                if y == wall_top: char = WALL_EDGE_CHARS["top"]
+                elif y == wall_bottom: char = WALL_EDGE_CHARS["bottom"]
+                elif is_left_edge: char = WALL_EDGE_CHARS["left"]
+                elif is_right_edge: char = WALL_EDGE_CHARS["right"]
+                elif position_in_wall > 0.8:
+                    shade_index = SHADING_CHARS.find(shade_char)
+                    if shade_index != -1 and shade_index + 1 < len(SHADING_CHARS):
+                        char = SHADING_CHARS[shade_index + 1]
 
                 stdscr.addch(y, column, char, color_attr)
             except curses.error:
@@ -335,108 +418,30 @@ def render_world(
         if screen_x < 0 or screen_x >= width:
             continue
 
-        if entity["type"] == entity_system.ENTITY_PROJECTILE:
-            if "pattern" in entity:
-                pattern = entity["pattern"]
-                pattern_height, pattern_width = len(pattern), (
-                    len(pattern[0]) if len(pattern) > 0 else 0
-                )
-
-                size_scale = min(1.0, 1.5 / max(1.0, entity_distance * 0.3))
-                draw_height, draw_width = max(1, int(pattern_height * size_scale)), max(
-                    1, int(pattern_width * size_scale)
-                )
-
-                start_x, start_y = (
-                    screen_x - draw_width // 2,
-                    screen_y - draw_height // 2,
-                )
-
-                pulse_factor = (
-                    0.7
-                    + 0.3
-                    * math.sin(
-                        (time.time() - entity["creation_time"])
-                        * entity.get("pulse_rate", 5.0)
-                        * 2
-                        * math.pi
-                    )
-                    if entity.get("glow", False)
-                    else 1.0
-                )
-
-                brightness = min(1.0, pulse_factor / max(0.5, entity_distance * 0.1))
-
-                color_attr = curses.color_pair(entity["color"]) | (
-                    curses.A_BOLD
-                    if brightness > 0.8
-                    else curses.A_DIM if brightness <= 0.4 else 0
-                )
-
-                for local_y in range(draw_height):
-                    pattern_y = min(
-                        pattern_height - 1, int(local_y / draw_height * pattern_height)
-                    )
-                    screen_pos_y = start_y + local_y
-
-                    if not (0 <= screen_pos_y < height):
-                        continue
-
-                    for local_x in range(draw_width):
-                        pattern_x = min(
-                            pattern_width - 1, int(local_x / draw_width * pattern_width)
-                        )
-                        screen_pos_x = start_x + local_x
-
-                        if not (0 <= screen_pos_x < width):
-                            continue
-
-                        if all(
-                            segment["column"] != screen_pos_x
-                            or segment["distance"] >= entity_distance
-                            for segment in wall_segments
-                        ) and pattern_x < len(pattern[pattern_y]):
-                            char = pattern[pattern_y][pattern_x]
-                            if char != " ":
-                                try:
-                                    stdscr.addch(
-                                        screen_pos_y, screen_pos_x, char, color_attr
-                                    )
-                                except curses.error:
-                                    pass
-
-            else:
-                try:
-                    if all(
-                        segment["column"] != screen_x
-                        or segment["distance"] >= entity_distance
-                        for segment in wall_segments
-                    ):
-                        color = curses.color_pair(entity["color"]) | curses.A_BOLD
-                        stdscr.addch(screen_y, screen_x, entity.get("char", "*"), color)
-                except curses.error:
-                    pass
+        if entity["type"] in [entity_system.ENTITY_PROJECTILE, entity_system.ENTITY_ENEMY_PROJECTILE]:
+            _render_pattern_entity(
+                stdscr,
+                entity,
+                screen_x,
+                screen_y,
+                entity_height,
+                entity_distance,
+                wall_segments,
+                height,
+                width,
+            )
 
         elif entity["type"] == entity_system.ENTITY_ENEMY:
             display_text = entity_system.get_enemy_display_text(entity, entity_distance)
-            color_attr = (
-                curses.color_pair(entity_system.ENEMY_DEAD_COLOR)
-                if entity["state"] == "dead"
-                else (
-                    curses.color_pair(entity_system.ENEMY_ALERT_COLOR) | curses.A_BOLD
-                    if entity["state"] == "attack" and int(time.time() * 4) % 2 == 0
-                    else (
-                        curses.color_pair(entity_system.ENEMY_ALERT_COLOR)
-                        | curses.A_BOLD
-                        if entity["state"] == "attack"
-                        else (
-                            curses.color_pair(entity_system.ENEMY_ALERT_COLOR)
-                            if entity["state"] == "chase"
-                            else curses.color_pair(entity["color"])
-                        )
-                    )
-                )
-            )
+            color_attr = curses.color_pair(entity["color"])
+            if entity["state"] == "dead":
+                color_attr = curses.color_pair(entity_system.ENEMY_DEAD_COLOR)
+            elif entity["state"] == "attack":
+                blink_on = int(time.time() * 4) % 2 == 0
+                color_attr = curses.color_pair(entity_system.ENEMY_ALERT_COLOR) | (curses.A_BOLD if blink_on else 0)
+            elif entity["state"] == "chase":
+                color_attr = curses.color_pair(entity_system.ENEMY_ALERT_COLOR)
+
 
             text_height = len(display_text)
             scaled_height = max(1, min(text_height, int(text_height * entity_scale)))
@@ -457,11 +462,13 @@ def render_world(
                     if not (0 <= screen_pos_x < width and 0 <= screen_pos_y < height):
                         continue
 
-                    if all(
-                        segment["column"] != screen_pos_x
-                        or segment["distance"] >= entity_distance
-                        for segment in wall_segments
-                    ) and j < len(line):
+                    is_occluded = False
+                    for segment in wall_segments:
+                        if segment["column"] == screen_pos_x and segment["distance"] < entity_distance:
+                            is_occluded = True
+                            break
+
+                    if not is_occluded and j < len(line):
                         try:
                             char = line[j]
                             stdscr.addch(screen_pos_y, screen_pos_x, char, color_attr)
@@ -469,7 +476,6 @@ def render_world(
                             pass
 
     from renderer.minimap_renderer import render_minimap
-
     render_minimap(
         stdscr, player_x, player_y, player_angle, world_map, world_colors, height, width
     )

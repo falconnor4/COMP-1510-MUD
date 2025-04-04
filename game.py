@@ -11,6 +11,7 @@ from player import create_player, update_input, update_player
 
 # Import our modules
 from renderer import init_colors, render_world, render_full_map
+from ui import display_game_over
 
 
 # pip install windows-curses  # Only for Windows users as Unix-based systems have curses pre-installed
@@ -102,6 +103,12 @@ def run_game(stdscr):
             quit_pressed = update_input(player_state, key, True)
             if quit_pressed:
                 running = False
+
+        # Check for game over condition *before* processing input/updates for the frame
+        if player_state['health'] <= 0:
+            display_game_over(stdscr, player_state)
+            running = False
+            return "menu"
 
         if not player_state["map_mode"] and not debug.DEBUG_CONSOLE["active"]:
             should_shoot, should_interact = update_player(
@@ -247,7 +254,7 @@ def run_game(stdscr):
         if delta_time < 0.033:  # Target ~30 FPS ish....
             time.sleep(0.033 - delta_time)
 
-    # Return to menu after game ends
+    # Return to menu after game ends (if not already returned via game over)
     return "menu"
 
 
