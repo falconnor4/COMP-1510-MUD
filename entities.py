@@ -1,6 +1,7 @@
 import math
 import random
 import time
+import ui
 from utils.collision import is_collision
 from anim.enemies.enemy_art import ENEMY_ASCII, DEATH_ASCII, BOSS_ASCII, BOSS_DEATH_ASCII
 from anim.projectiles.projectile_art import PROJECTILE_PATTERNS, ENEMY_PROJECTILE_PATTERNS
@@ -148,10 +149,7 @@ def create_boss(x, y):
     entities.append(boss)
     enemies.append(boss)
 
-    import ui
-
-    ui.add_message("RUNTIME OVERLORD has appeared!", 5.0, color=1)
-    ui.add_message("System stability compromised!", 5.0, color=1)
+    ui.add_message("Kanka", 5.0, color=1)
 
     return boss
 
@@ -179,8 +177,6 @@ def update_entities(
 
                 award_xp(player_state, xp_gained)
                 player_state["kills"] += 1
-
-                import ui
 
                 ui.add_message(f"Enemy defeated! +{xp_gained} XP", 2.0, color=2)
 
@@ -254,8 +250,6 @@ def update_enemy_projectiles(delta_time, world_map, player_x, player_y, player_s
             if dist < 0.5:
                 player_state['health'] -= proj['damage']
                 proj['remove'] = True
-
-                import ui
                 ui.add_message(f"HIT! -{proj['damage']} HP", 1.0, color=1)
 
                 if player_state['health'] <= 0:
@@ -340,7 +334,7 @@ def update_enemies(delta_time, world_map, player_x, player_y, player_angle, play
 def update_boss_behavior(
     boss, delta_time, world_map, player_x, player_y, player_angle, current_time, player_state
 ):
-    """Handle boss-specific AI while reusing common enemy behavior"""
+    """Handle boss-specific AI"""
 
     dx = player_x - boss["x"]
     dy = player_y - boss["y"]
@@ -352,13 +346,6 @@ def update_boss_behavior(
             boss["attack_patterns"]
         )
         boss["pattern_timer"] = current_time
-
-        import ui
-
-        pattern_name = boss["attack_patterns"][boss["current_pattern"]].upper()
-        ui.add_message(
-            f"RUNTIME OVERLORD: {pattern_name} PROTOCOL ENGAGED", 3.0, color=1
-        )
 
     if dist_to_player <= boss["detection_range"] and has_line_of_sight(
         boss["x"], boss["y"], player_x, player_y, world_map
@@ -570,8 +557,6 @@ def award_xp(player_state, amount):
         level_up_occurred = True
 
     if level_up_occurred:
-        import ui
-
         ui.add_message(
             f"Level up! You're now level {player_state['level']}!", 3.0, color=6
         )
