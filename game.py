@@ -165,6 +165,15 @@ def run_game(stdscr):
                     current_map,
                 )
 
+                # Check for boss corpse interaction (Game Win condition)
+                for entity in entities.entities:
+                    if (entity.get("subtype") == "boss" and 
+                        entity.get("state") == "dead" and
+                        abs(entity["x"] - player_state["x"]) < 1.5 and
+                        abs(entity["y"] - player_state["y"]) < 1.5):
+                        ui.display_win_screen(stdscr, player_state)
+                        return "menu"
+
                 if object_type == "door":
                     level_to_switch = 2 if current_map == ACTIVE_MAP else 1
                     _handle_level_change(level_to_switch)

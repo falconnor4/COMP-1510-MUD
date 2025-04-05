@@ -435,9 +435,9 @@ def cleanup_entities():
     """Remove entities marked for removal"""
     global entities, projectiles, enemies, enemy_projectiles
 
-    entities = [e for e in entities if not e.get("remove", False)]
+    entities = [e for e in entities if not e.get("remove", False) or (e.get("subtype") == "boss" and e.get("state") == "dead")]
     projectiles = [p for p in projectiles if not p.get("remove", False)]
-    enemies = [e for e in enemies if not e.get("remove", False)]
+    enemies = [e for e in enemies if not e.get("remove", False) or (e.get("subtype") == "boss" and e.get("state") == "dead")]
     enemy_projectiles = [p for p in enemy_projectiles if not p.get("remove", False)]
 
 
