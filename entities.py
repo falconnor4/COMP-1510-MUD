@@ -2,6 +2,8 @@ import math
 import random
 import time
 from utils.collision import is_collision
+from anim.enemies.enemy_art import ENEMY_ASCII, DEATH_ASCII, BOSS_ASCII, BOSS_DEATH_ASCII
+from anim.projectiles.projectile_art import PROJECTILE_PATTERNS, ENEMY_PROJECTILE_PATTERNS
 
 entities = []
 projectiles = []
@@ -12,53 +14,6 @@ ENTITY_PROJECTILE = "projectile"
 ENTITY_ENEMY = "enemy"
 ENTITY_ENEMY_PROJECTILE = "enemy_projectile"
 
-ENEMY_ASCII = [
-    ["ERROR", "FATAL", "CRASH", "#$*@!"],
-    ["SYNTAX", "ERROR!", "SEGFLT", "-----"],
-    ["MEMORY", "LEAK!", "PANIC", "/dev/0"],
-    ["BUFFER", "OVRFLW", "STACK", "SMASHD"],
-    ["NULLPT", "EXCEPT", "SYSTEM", "FAILED"],
-]
-
-DEATH_ASCII = [
-    ["CORE", "DUMP", "----", "0x00"],
-    ["EXIT:", "CODE1", "TERM", "INATED"],
-    ["KILL", "SIGNAL", "RECVD", "-----"],
-    ["PANIC", "ABORT", "CRASH", "xxxxx"],
-]
-
-BOSS_ASCII = [
-    "   ███████████   ",
-    " ███████████████ ",
-    "█████RUNTIME█████",
-    "█████OVERLORD████",
-    "███████████████ █",
-    "██  ███████  █  █",
-    "█ ██ ██████ ██ ██",
-    "█ ██ ██████ ██ ██",
-    "█    ███████    █",
-    "██████ERROR██████",
-    "███████████████ █",
-    "█ ████████████ ██",
-    " █ ██████████ ███",
-    "  █ ████████ ████",
-    "   █        █████",
-    "    ██████████   ",
-]
-
-BOSS_DEATH_ASCII = [
-    "   ****  ****   ",
-    "  *   *  *   *  ",
-    " * CRITICAL ERROR",
-    " FATAL EXCEPTION *",
-    "*  STACK SMASH   *",
-    "* CORE DUMPED   * ",
-    " *   X    X    * ",
-    " *    ____    *  ",
-    "  *   ====   *   ",
-    "   **********    ",
-]
-
 ENEMY_COLOR = 1
 ENEMY_ALERT_COLOR = 5
 ENEMY_DEAD_COLOR = 8
@@ -66,72 +21,6 @@ PROJECTILE_COLOR = 3
 ENEMY_XP_VALUE = 50
 ENEMY_PROJECTILE_COLOR = 1
 ENEMY_PROJECTILE_DAMAGE = 15
-
-PROJECTILE_PATTERNS = [
-    [
-        "                    ",
-        "      ++.:--*.      ",
-        "    ==+***#%*=*.    ",
-        "   *#%%%%%%%@%%#*   ",
-        "  *%@%%%#*##%@@@@*  ",
-        "  %%@%%%*:=#%@@@@%  ",
-        "  +#@#%%%#%%%@@#*+  ",
-        "   -@@@%@#@%@@@@=   ",
-        "     *%%@%%@@%#     ",
-        "        +#**        ",
-        "                    ",
-    ],
-    [
-        "                    ",
-        "         **         ",
-        "    %:-%@@@@@@@@    ",
-        "  #.:+#@@@@@@@%#+%  ",
-        " +:--=#%%#####%%%*: ",
-        " :=--=%%%*****#%%%- ",
-        " %+==+%%%#***##%%%= ",
-        " %%***%%%%#**##%%@. ",
-        "  %%#%%%%#####%%@@  ",
-        "    @%%@%%%%%%%%    ",
-        "       @@@@@@       ",
-        "                    ",
-    ],
-    [
-        "                    ",
-        "                    ",
-        "       ---=*#%      ",
-        "     -::::-=+#@@    ",
-        "    -::..::-+#@@@   ",
-        "    =-::::-=*%@@@   ",
-        "    #*+==+*#%@@@@   ",
-        "     %%%%%%@@@@@    ",
-        "       @@@@@@@      ",
-        "                    ",
-        "                    ",
-    ],
-]
-
-ENEMY_PROJECTILE_PATTERNS = [
-    [
-        "-*- ",
-        " <*>",
-        " -*- ",
-    ],
-    [
-        " oOo ",
-        "o###o",
-        " oOo ",
-    ],
-    [
-        "\\|//",
-        "--+--",
-        "//|\\",
-    ],
-    [
-        " xx",
-        "xxxx",
-        " xx",
-    ]
-]
 
 
 def create_projectile(x, y, angle, speed=5.0, lifetime=1.5, damage=25):
