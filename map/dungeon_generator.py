@@ -153,75 +153,85 @@ def generate_dungeon(width, height, archetype_key=None):
                 if 0 <= i < height and 0 <= j < width:
                     dungeon[i][j] = floor_tile
 
-    def _carve_h_corridor(dungeon, x1, x2, y, tile, corridor_w):
-        """Carves a horizontal corridor segment."""
-        h, w = len(dungeon), len(dungeon[0])
-        for x in range(min(x1, x2), max(x1, x2) + 1):
-            start_offset = -(corridor_w // 2)
-            end_offset = corridor_w // 2 + (corridor_w % 2)
-            for offset in range(start_offset, end_offset):
-                ny = y + offset
-                if 0 < ny < h - 1 and 0 < x < w - 1:
-                    dungeon[ny][x] = tile
+    def connect_rooms():
+        centers = [
+            (
+                node["room"][0] + node["room"][2] // 2,
+                node["room"][1] + node["room"][3] // 2,
+            )
+            for node in leaves
+            if node["room"]
+        ]
 
-    def _carve_v_corridor(dungeon, y1, y2, x, tile, corridor_w):
-        """Carves a vertical corridor segment."""
-        h, w = len(dungeon), len(dungeon[0])
-        for y in range(min(y1, y2), max(y1, y2) + 1):
-            start_offset = -(corridor_w // 2)
-            end_offset = corridor_w // 2 + (corridor_w % 2)
-            for offset in range(start_offset, end_offset):
-                nx = x + offset
-                if 0 < y < h - 1 and 0 < nx < w - 1:
-                    dungeon[y][nx] = tile
-
-    def connect_rooms(leaf_nodes):
-        """Connects rooms using MST and L-shaped corridors."""
-        room_centers = []
-        for node in leaf_nodes:
-            if node and node["room"]:
-                rx, ry, rw, rh = node["room"]
-                center_x = max(1, min(width - 2, rx + rw // 2))
-                center_y = max(1, min(height - 2, ry + rh // 2))
-                room_centers.append((center_x, center_y))
-
-        if len(room_centers) <= 1:
+        if len(centers) <= 1:
             return
 
-        start_node_idx = 0
-        visited_centers = {room_centers[start_node_idx]}
         edges = []
+        for i, (x1, y1) in enumerate(centers):
+            for j, (x2, y2) in enumerate(centers):
+                if i != j:
+                    dist = abs(x2 - x1) + abs(y2 - y1)
+                    edges.append((dist, (x1, y1), (x2, y2)))
+        edges.sort()
 
-        for i, center in enumerate(room_centers):
-            if i != start_node_idx:
-                dist = abs(center[0] - room_centers[start_node_idx][0]) + abs(center[1] - room_centers[start_node_idx][1])
-                heapq.heappush(edges, (dist, room_centers[start_node_idx], center))
+        connected = {i: i for i in range(len(centers))}
+
+        def find(x):
+            if connected[x] == x:
+                return x
+            connected[x] = find(connected[x])
+            return connected[x]
 
         corridor_w = archetype["corridor_width"]
 
-        while edges and len(visited_centers) < len(room_centers):
-            _, p1, p2 = heapq.heappop(edges)
+        for _, (x1, y1), (x2, y2) in edges:
+            set1 = find(centers.index((x1, y1)))
+            set2 = find(centers.index((x2, y2)))
 
-            if p2 in visited_centers:
-                continue
+            if set1 != set2:
+                connected[set2] = set1
 
-            visited_centers.add(p2)
+                mid_x, mid_y = (x2, y1) if random.random() < 0.5 else (x1, y2)
 
-            x1, y1 = p1
-            x2, y2 = p2
-            if random.random() < 0.5:
-                _carve_h_corridor(dungeon, x1, x2, y1, path_tile, corridor_w)
-                _carve_v_corridor(dungeon, y1, y2, x2, path_tile, corridor_w)
-            else:
-                _carve_v_corridor(dungeon, y1, y2, x1, path_tile, corridor_w)
-                _carve_h_corridor(dungeon, x1, x2, y2, path_tile, corridor_w)
+                for x in range(min(x1, mid_x), max(x1, mid_x) + 1):
+                    for offset in range(-corridor_w // 2 + 1, corridor_w // 2 + 1):
+                        ny = y1 + offset
+                        if 0 < ny < height - 1 and 0 < x < width - 1:
+                            dungeon[ny][x] = (
+                                path_tile if random.random() < 0.7 else floor_tile
+                            )
 
-            for i, center in enumerate(room_centers):
-                if center not in visited_centers:
-                    new_dist = abs(center[0] - p2[0]) + abs(center[1] - p2[1])
-                    heapq.heappush(edges, (new_dist, p2, center))
+                for y in range(min(y1, mid_y), max(y1, mid_y) + 1):
+                    for offset in range(-corridor_w // 2 + 1, corridor_w // 2 + 1):
+                        nx = mid_x + offset
+                        if 0 < y < height - 1 and 0 < nx < width - 1:
+                            dungeon[y][nx] = (
+                                path_tile if random.random() < 0.7 else floor_tile
+                            )
 
-    connect_rooms(leaves)
+                for y in range(mid_y - 1, mid_y + 2):
+                    for x in range(mid_x - 1, mid_x + 2):
+                        if 0 < y < height - 1 and 0 < x < width - 1:
+                            dungeon[y][x] = floor_tile
+
+                if mid_x != x2 or mid_y != y2:
+                    for x in range(min(mid_x, x2), max(mid_x, x2) + 1):
+                        for offset in range(-corridor_w // 2 + 1, corridor_w // 2 + 1):
+                            ny = y2 + offset
+                            if 0 < ny < height - 1 and 0 < x < width - 1:
+                                dungeon[ny][x] = (
+                                    path_tile if random.random() < 0.7 else floor_tile
+                                )
+
+                    for y in range(min(mid_y, y2), max(mid_y, y2) + 1):
+                        for offset in range(-corridor_w // 2 + 1, corridor_w // 2 + 1):
+                            nx = x2 + offset
+                            if 0 < y < height - 1 and 0 < nx < width - 1:
+                                dungeon[y][nx] = (
+                                    path_tile if random.random() < 0.7 else floor_tile
+                                )
+
+    connect_rooms()
 
     for y in range(1, height - 1):
         for x in range(1, width - 1):
