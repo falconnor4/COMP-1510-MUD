@@ -25,7 +25,27 @@ ENEMY_PROJECTILE_DAMAGE = 15
 
 
 def create_projectile(x, y, angle, speed=5.0, lifetime=1.5, damage=25):
-    """Create a new projectile entity at the given position and angle"""
+    """
+    Create a new projectile entity at the given position and angle.
+    :param x: x-coordinate of the projectile's starting position
+    :param y: y-coordinate of the projectile's starting position
+    :param angle: direction in radians that the projectile will travel
+    :param speed: velocity of the projectile (default 5.0)
+    :param lifetime: duration in seconds before projectile disappears (default 1.5)
+    :param damage: amount of damage the projectile inflicts (default 25)
+    :precondition: x and y must be valid coordinates in the game world
+    :precondition: angle must be in radians between 0 and 2π
+    :precondition: speed, lifetime, and damage must be positive numbers
+    :postcondition: creates a projectile entity at the specified position with the given properties
+    :return: the newly created projectile entity as a dictionary
+    >>> proj = create_projectile(5.0, 5.0, 0.0)
+    >>> proj["type"] == ENTITY_PROJECTILE
+    True
+    >>> proj["x"] == 5.0 and proj["y"] == 5.0 and proj["angle"] == 0.0
+    True
+    >>> proj["speed"] == 5.0 and proj["damage"] == 25
+    True
+    """
 
     pattern = random.choice(PROJECTILE_PATTERNS)
 
@@ -54,7 +74,27 @@ def create_projectile(x, y, angle, speed=5.0, lifetime=1.5, damage=25):
 
 
 def create_enemy_projectile(x, y, angle, speed=4.0, lifetime=2.0, damage=ENEMY_PROJECTILE_DAMAGE):
-    """Create a new enemy projectile entity."""
+    """
+    Create a new enemy projectile entity.
+    :param x: x-coordinate of the projectile's starting position
+    :param y: y-coordinate of the projectile's starting position
+    :param angle: direction in radians that the projectile will travel
+    :param speed: velocity of the projectile (default 4.0)
+    :param lifetime: duration in seconds before projectile disappears (default 2.0)
+    :param damage: amount of damage the projectile inflicts (default ENEMY_PROJECTILE_DAMAGE)
+    :precondition: x and y must be valid coordinates in the game world
+    :precondition: angle must be in radians between 0 and 2π
+    :precondition: speed, lifetime, and damage must be positive numbers
+    :postcondition: creates an enemy projectile entity at the specified position with the given properties
+    :return: the newly created enemy projectile entity as a dictionary
+    >>> proj = create_enemy_projectile(10.0, 8.0, 1.5)
+    >>> proj["type"] == ENTITY_ENEMY_PROJECTILE
+    True
+    >>> proj["x"] == 10.0 and proj["y"] == 8.0
+    True
+    >>> proj["damage"] == ENEMY_PROJECTILE_DAMAGE
+    True
+    """
     pattern = random.choice(ENEMY_PROJECTILE_PATTERNS)
     projectile = {
         "type": ENTITY_ENEMY_PROJECTILE,
@@ -80,7 +120,23 @@ def create_enemy_projectile(x, y, angle, speed=4.0, lifetime=2.0, damage=ENEMY_P
 
 
 def create_enemy(x, y, health=100):
-    """Create a new enemy entity at the given position"""
+    """
+    Create a new enemy entity at the given position.
+    :param x: x-coordinate of the enemy's position
+    :param y: y-coordinate of the enemy's position
+    :param health: initial health points of the enemy (default 100)
+    :precondition: x and y must be valid coordinates in the game world
+    :precondition: health must be a positive integer
+    :postcondition: creates an enemy entity at the specified position with the given properties
+    :return: the newly created enemy entity as a dictionary
+    >>> enemy = create_enemy(5.0, 5.0)
+    >>> enemy["type"] == ENTITY_ENEMY
+    True
+    >>> enemy["x"] == 5.0 and enemy["y"] == 5.0
+    True
+    >>> enemy["health"] == 100 and enemy["max_health"] == 100
+    True
+    """
 
     ascii_art = random.choice(ENEMY_ASCII)
     death_art = random.choice(DEATH_ASCII)
@@ -115,7 +171,21 @@ def create_enemy(x, y, health=100):
 
 
 def create_boss(x, y):
-    """Create a boss entity at the given position"""
+    """
+    Create a boss entity at the given position.
+    :param x: x-coordinate of the boss's position
+    :param y: y-coordinate of the boss's position
+    :precondition: x and y must be valid coordinates in the game world
+    :postcondition: creates a boss entity at the specified position with predefined boss properties
+    :return: the newly created boss entity as a dictionary
+    >>> boss = create_boss(15.0, 15.0)
+    >>> boss["type"] == ENTITY_ENEMY and boss["subtype"] == "boss"
+    True
+    >>> boss["x"] == 15.0 and boss["y"] == 15.0
+    True
+    >>> boss["health"] == 500 and boss["max_health"] == 500
+    True
+    """
 
     boss = {
         "type": ENTITY_ENEMY,
