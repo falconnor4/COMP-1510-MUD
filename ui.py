@@ -79,13 +79,19 @@ def update_animation():
 
     current_time = time.time()
 
-    if current_time - current_animation["last_frame_time"] > current_animation["frame_delay"]:
+    if (
+        current_time - current_animation["last_frame_time"]
+        > current_animation["frame_delay"]
+    ):
         current_animation["frame_index"] += 1
-        current_animation["last_frame_time"] = current_time
+        current_animation["last_frame_time"] = int(current_time)
 
-        if (not current_animation["midpoint_triggered"]
+        if (
+            not current_animation["midpoint_triggered"]
             and current_animation["midpoint_callback"]
-            and current_animation["frame_index"] >= len(current_animation["frames"]) // 2):
+            and current_animation["frame_index"]
+            >= len(current_animation["frames"]) // 2
+        ):
             current_animation["midpoint_callback"]()
             current_animation["midpoint_triggered"] = True
 
