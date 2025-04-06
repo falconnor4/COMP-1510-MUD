@@ -3,8 +3,16 @@ import random
 import time
 import ui
 from utils.collision import is_collision
-from anim.enemies.enemy_art import ENEMY_ASCII, DEATH_ASCII, BOSS_ASCII, BOSS_DEATH_ASCII
-from anim.projectiles.projectile_art import PROJECTILE_PATTERNS, ENEMY_PROJECTILE_PATTERNS
+from anim.enemies.enemy_art import (
+    ENEMY_ASCII,
+    DEATH_ASCII,
+    BOSS_ASCII,
+    BOSS_DEATH_ASCII,
+)
+from anim.projectiles.projectile_art import (
+    PROJECTILE_PATTERNS,
+    ENEMY_PROJECTILE_PATTERNS,
+)
 
 entities = []
 projectiles = []
@@ -73,7 +81,9 @@ def create_projectile(x, y, angle, speed=5.0, lifetime=1.5, damage=25):
     return projectile
 
 
-def create_enemy_projectile(x, y, angle, speed=4.0, lifetime=2.0, damage=ENEMY_PROJECTILE_DAMAGE):
+def create_enemy_projectile(
+    x, y, angle, speed=4.0, lifetime=2.0, damage=ENEMY_PROJECTILE_DAMAGE
+):
     """
     Create a new enemy projectile entity.
     :param x: x-coordinate of the projectile's starting position
@@ -129,12 +139,12 @@ def create_enemy(x, y, health=100):
     :precondition: health must be a positive integer
     :postcondition: creates an enemy entity at the specified position with the given properties
     :return: the newly created enemy entity as a dictionary
-    >>> enemy = create_enemy(5.0, 5.0)
-    >>> enemy["type"] == ENTITY_ENEMY
+    >>> larry = create_enemy(5.0, 5.0)
+    >>> larry["type"] == ENTITY_ENEMY
     True
-    >>> enemy["x"] == 5.0 and enemy["y"] == 5.0
+    >>> larry["x"] == 5.0 and larry["y"] == 5.0
     True
-    >>> enemy["health"] == 100 and enemy["max_health"] == 100
+    >>> larry["health"] == 100 and larry["max_health"] == 100
     True
     """
 
@@ -178,12 +188,12 @@ def create_boss(x, y):
     :precondition: x and y must be valid coordinates in the game world
     :postcondition: creates a boss entity at the specified position with predefined boss properties
     :return: the newly created boss entity as a dictionary
-    >>> boss = create_boss(15.0, 15.0)
-    >>> boss["type"] == ENTITY_ENEMY and boss["subtype"] == "boss"
+    >>> biff = create_boss(15.0, 15.0)
+    >>> biff["type"] == ENTITY_ENEMY and biff["subtype"] == "boss"
     True
-    >>> boss["x"] == 15.0 and boss["y"] == 15.0
+    >>> biff["x"] == 15.0 and biff["y"] == 15.0
     True
-    >>> boss["health"] == 500 and boss["max_health"] == 500
+    >>> biff["health"] == 500 and biff["max_health"] == 500
     True
     """
 
@@ -224,16 +234,16 @@ def create_boss(x, y):
     return boss
 
 
-def update_entities(
-    delta_time, world_map, player_x, player_y, player_angle, player_state=None
-):
+def update_entities(delta_time, world_map, player_x, player_y, player_state=None):
     """Update all entities in the world"""
     current_time = time.time()
 
-    update_projectiles(delta_time, world_map, player_state, current_time)
-    update_enemy_projectiles(delta_time, world_map, player_x, player_y, player_state, current_time)
+    update_projectiles(delta_time, world_map, current_time)
+    update_enemy_projectiles(
+        delta_time, world_map, player_x, player_y, player_state, current_time
+    )
 
-    update_enemies(delta_time, world_map, player_x, player_y, player_angle, player_state, current_time)
+    update_enemies(delta_time, world_map, player_x, player_y, current_time)
 
     for enemy in enemies[:]:
         if enemy["state"] == "dead" and not enemy.get("xp_awarded", False):
@@ -279,7 +289,7 @@ def _update_projectile_movement(proj, delta_time, world_map, current_time):
     return False
 
 
-def update_projectiles(delta_time, world_map, player_state, current_time):
+def update_projectiles(delta_time, world_map, current_time):
     """Update all player projectile positions and check for collisions with enemies"""
     for proj in projectiles[:]:
         if _update_projectile_movement(proj, delta_time, world_map, current_time):
@@ -306,7 +316,9 @@ def update_projectiles(delta_time, world_map, player_state, current_time):
                 break
 
 
-def update_enemy_projectiles(delta_time, world_map, player_x, player_y, player_state, current_time):
+def update_enemy_projectiles(
+    delta_time, world_map, player_x, player_y, player_state, current_time
+):
     """Update enemy projectiles and check for collision with the player."""
     for proj in enemy_projectiles[:]:
         if _update_projectile_movement(proj, delta_time, world_map, current_time):
@@ -318,16 +330,16 @@ def update_enemy_projectiles(delta_time, world_map, player_x, player_y, player_s
             dist = math.sqrt(dx * dx + dy * dy)
 
             if dist < 0.5:
-                player_state['health'] -= proj['damage']
-                proj['remove'] = True
+                player_state["health"] -= proj["damage"]
+                proj["remove"] = True
                 ui.add_message(f"HIT! -{proj['damage']} HP", 1.0, color=1)
 
-                if player_state['health'] <= 0:
-                    player_state['health'] = 0
+                if player_state["health"] <= 0:
+                    player_state["health"] = 0
                 continue
 
 
-def update_enemies(delta_time, world_map, player_x, player_y, player_angle, player_state, current_time):
+def update_enemies(delta_time, world_map, player_x, player_y, current_time):
     """Update all enemies, including bosses with special handling"""
 
     for enemy in enemies:
@@ -341,9 +353,7 @@ def update_enemies(delta_time, world_map, player_x, player_y, player_angle, play
                 world_map,
                 player_x,
                 player_y,
-                player_angle,
                 current_time,
-                player_state
             )
             continue
 
@@ -367,7 +377,9 @@ def update_enemies(delta_time, world_map, player_x, player_y, player_angle, play
             enemy["state"] = next_state
             enemy["last_state_change"] = current_time
             if next_state == "attack":
-                enemy["last_attack"] = current_time - enemy["attack_cooldown"] * random.uniform(0.5, 1.0)
+                enemy["last_attack"] = current_time - enemy[
+                    "attack_cooldown"
+                ] * random.uniform(0.5, 1.0)
 
         if current_time - enemy["last_move"] > enemy["move_delay"]:
             enemy["last_move"] = current_time
@@ -386,8 +398,16 @@ def update_enemies(delta_time, world_map, player_x, player_y, player_angle, play
 
             elif enemy["state"] == "attack":
                 if current_time - enemy["last_attack"] > enemy["attack_cooldown"]:
-                    if has_line_of_sight(enemy["x"], enemy["y"], player_x, player_y, world_map):
-                        create_enemy_projectile(enemy["x"], enemy["y"], angle_to_player, speed=3.0, lifetime=2.5)
+                    if has_line_of_sight(
+                        enemy["x"], enemy["y"], player_x, player_y, world_map
+                    ):
+                        create_enemy_projectile(
+                            enemy["x"],
+                            enemy["y"],
+                            angle_to_player,
+                            speed=3.0,
+                            lifetime=2.5,
+                        )
                         enemy["last_attack"] = current_time
                         enemy["move_delay"] = random.uniform(0.8, 1.5)
                     else:
@@ -396,14 +416,14 @@ def update_enemies(delta_time, world_map, player_x, player_y, player_angle, play
                         try_move_entity(enemy, jitter_angle, jitter_dist, world_map)
                 else:
                     if random.random() < 0.5:
-                        strafe_angle = angle_to_player + math.pi / 2 * random.choice([-1, 1])
+                        strafe_angle = angle_to_player + math.pi / 2 * random.choice(
+                            [-1, 1]
+                        )
                         strafe_dist = 0.1
                         try_move_entity(enemy, strafe_angle, strafe_dist, world_map)
 
 
-def update_boss_behavior(
-    boss, delta_time, world_map, player_x, player_y, player_angle, current_time, player_state
-):
+def update_boss_behavior(boss, delta_time, world_map, player_x, player_y, current_time):
     """Handle boss-specific AI"""
 
     dx = player_x - boss["x"]
@@ -505,9 +525,19 @@ def cleanup_entities():
     """Remove entities marked for removal"""
     global entities, projectiles, enemies, enemy_projectiles
 
-    entities = [e for e in entities if not e.get("remove", False) or (e.get("subtype") == "boss" and e.get("state") == "dead")]
+    entities = [
+        e
+        for e in entities
+        if not e.get("remove", False)
+        or (e.get("subtype") == "boss" and e.get("state") == "dead")
+    ]
     projectiles = [p for p in projectiles if not p.get("remove", False)]
-    enemies = [e for e in enemies if not e.get("remove", False) or (e.get("subtype") == "boss" and e.get("state") == "dead")]
+    enemies = [
+        e
+        for e in enemies
+        if not e.get("remove", False)
+        or (e.get("subtype") == "boss" and e.get("state") == "dead")
+    ]
     enemy_projectiles = [p for p in enemy_projectiles if not p.get("remove", False)]
 
 

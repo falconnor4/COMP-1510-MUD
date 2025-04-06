@@ -151,7 +151,6 @@ def run_game(stdscr):
                 current_map,
                 player_state["x"],
                 player_state["y"],
-                player_state["angle"],
                 player_state,
             )
 
