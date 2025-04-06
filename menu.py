@@ -138,20 +138,22 @@ def display_screen(stdscr, title, content, line_styles=None):
 def show_instructions(stdscr):
     """Display game instructions"""
     instructions = [
-        "MOVEMENT CONTROLS:",
-        "  W - Move Forward",
-        "  S - Move Backward",
-        "  A - Strafe Left",
-        "  D - Strafe Right",
-        "",
-        "TURNING:",
-        "  LEFT ARROW - Turn Left",
-        "  RIGHT ARROW - Turn Right",
+        "MOVEMENT:",
+        "  W/A/S/D - Move Forward/Left/Backward/Right",
+        "  LEFT/RIGHT ARROW - Turn Left/Right",
+        "  Due to terminal limitations, each key has inertia,",
+        "  so you may need to spam the keys to get the desired effect.",
         "",
         "ACTIONS:",
-        "  SPACEBAR - Shoot",
+        "  SPACEBAR - Throw Fireball",
+        "  E - Interact",
         "  Q - Quit Game",
         "  M - Toggle Map Mode",
+        "",
+        "GAME OBJECTIVES:",
+        "  Each level spawns more enemies than the last.",
+        "  Interact with the boss's corpse to win the game.",
+        "  A boss door will spawn after level 3.",
         "",
         "TERRAIN TYPES:",
         "  '#' - Wall       '♣' - Tree",
@@ -163,9 +165,9 @@ def show_instructions(stdscr):
 
     def instruction_styles(i, line):
         if (
-            "CONTROLS:" in line
-            or "TURNING:" in line
+            "MOVEMENT:" in line
             or "ACTIONS:" in line
+            or "GAME OBJECTIVES:" in line
             or "TERRAIN TYPES:" in line
         ):
             return curses.color_pair(1) | curses.A_BOLD
