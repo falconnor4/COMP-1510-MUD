@@ -161,7 +161,7 @@ def show_instructions(stdscr):
         "  ':' - Sand       ' ' - Empty",
     ]
 
-    def instruction_styles(line):
+    def instruction_styles(i, line):
         if (
             "CONTROLS:" in line
             or "TURNING:" in line
