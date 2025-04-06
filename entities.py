@@ -3,6 +3,7 @@ import random
 import time
 import ui
 from utils.collision import is_collision
+from utils.math_utils import distance_between, has_line_of_sight
 from anim.enemies.enemy_art import (
     ENEMY_ASCII,
     DEATH_ASCII,
@@ -235,7 +236,26 @@ def create_boss(x, y):
 
 
 def update_entities(delta_time, world_map, player_x, player_y, player_state=None):
-    """Update all entities in the world"""
+    """
+    Update the state of all active entities in the game world.
+
+    This function orchestrates the updates for projectiles, enemy projectiles,
+    and enemies (including bosses). It also handles awarding XP to the player
+    when enemies are defeated and manages the removal of dead enemies after a delay.
+
+    :param delta_time: float, the time elapsed since the last frame.
+    :param world_map: list[list[int]], the current game map layout.
+    :param player_x: float, the player's current x-coordinate.
+    :param player_y: float, the player's current y-coordinate.
+    :param player_state: dict | None, the player's state dictionary, or None.
+    :precondition: delta_time must be a non-negative float.
+    :precondition: world_map must be a valid map structure.
+    :precondition: player_x and player_y must be valid coordinates.
+    :postcondition: All entities (projectiles, enemies) are updated based on delta_time and game logic.
+    :postcondition: XP is awarded to the player if enemies are defeated nearby.
+    :postcondition: Entities marked for removal are cleaned up.
+    :return: list[dict], the updated list of all entities.
+    """
     current_time = time.time()
 
     update_projectiles(delta_time, world_map, current_time)
@@ -243,7 +263,7 @@ def update_entities(delta_time, world_map, player_x, player_y, player_state=None
         delta_time, world_map, player_x, player_y, player_state, current_time
     )
 
-    update_enemies(delta_time, world_map, player_x, player_y, current_time)
+    update_enemies(delta_time, world_map, player_x, player_y, player_state, current_time)
 
     for enemy in enemies[:]:
         if enemy["state"] == "dead" and not enemy.get("xp_awarded", False):
@@ -271,7 +291,23 @@ def update_entities(delta_time, world_map, player_x, player_y, player_state=None
 
 
 def _update_projectile_movement(proj, delta_time, world_map, current_time):
-    """Helper to update projectile position, check lifetime and world collision. Returns True if projectile should be removed."""
+    """
+    Update a single projectile's position and check for lifetime expiry or collision.
+
+    Helper function for projectile update logic. Modifies the projectile dictionary directly.
+
+    :param proj: dict, the projectile entity dictionary.
+    :param delta_time: float, the time elapsed since the last frame.
+    :param world_map: list[list[int]], the game map for collision checks.
+    :param current_time: float, the current game time.
+    :precondition: proj must be a valid projectile dictionary.
+    :precondition: delta_time must be non-negative.
+    :precondition: world_map must be a valid map.
+    :precondition: current_time must be a valid timestamp.
+    :postcondition: Updates proj['x'], proj['y'] based on speed, angle, and delta_time.
+    :postcondition: Sets proj['remove'] to True if lifetime expires or collision occurs.
+    :return: bool, True if the projectile should be removed, False otherwise.
+    """
     if proj["remove"]:
         return True
 
@@ -290,7 +326,25 @@ def _update_projectile_movement(proj, delta_time, world_map, current_time):
 
 
 def update_projectiles(delta_time, world_map, current_time):
-    """Update all player projectile positions and check for collisions with enemies"""
+    """
+    Update all active player projectiles.
+
+    Moves projectiles, checks for collisions with the world map and enemies.
+    Marks projectiles and hit enemies accordingly.
+
+    :param delta_time: float, time elapsed since the last frame.
+    :param world_map: list[list[int]], the game map for collision checks.
+    :param current_time: float, the current game time.
+    :precondition: delta_time must be non-negative.
+    :precondition: world_map must be a valid map.
+    :precondition: current_time must be a valid timestamp.
+    :postcondition: Player projectiles are moved.
+    :postcondition: Projectiles colliding with walls or enemies are marked for removal.
+    :postcondition: Enemies hit by projectiles take damage and may change state to 'dead'.
+
+    # Doctest is complex due to dependencies on global lists (projectiles, enemies)
+    # and collision logic. Requires setup and teardown.
+    """
     for proj in projectiles[:]:
         if _update_projectile_movement(proj, delta_time, world_map, current_time):
             continue
@@ -319,7 +373,26 @@ def update_projectiles(delta_time, world_map, current_time):
 def update_enemy_projectiles(
     delta_time, world_map, player_x, player_y, player_state, current_time
 ):
-    """Update enemy projectiles and check for collision with the player."""
+    """
+    Update all active enemy projectiles.
+
+    Moves projectiles, checks for collisions with the world map and the player.
+    Marks projectiles for removal and applies damage to the player if hit.
+
+    :param delta_time: float, time elapsed since the last frame.
+    :param world_map: list[list[int]], the game map for collision checks.
+    :param player_x: float, the player's current x-coordinate.
+    :param player_y: float, the player's current y-coordinate.
+    :param player_state: dict | None, the player's state dictionary for applying damage.
+    :param current_time: float, the current game time.
+    :precondition: delta_time must be non-negative.
+    :precondition: world_map must be a valid map.
+    :precondition: player_x, player_y must be valid coordinates.
+    :precondition: current_time must be a valid timestamp.
+    :postcondition: Enemy projectiles are moved.
+    :postcondition: Projectiles colliding with walls or the player are marked for removal.
+    :postcondition: Player health is reduced if hit by a projectile.
+    """
     for proj in enemy_projectiles[:]:
         if _update_projectile_movement(proj, delta_time, world_map, current_time):
             continue
@@ -339,9 +412,27 @@ def update_enemy_projectiles(
                 continue
 
 
-def update_enemies(delta_time, world_map, player_x, player_y, current_time):
-    """Update all enemies, including bosses with special handling"""
+def update_enemies(delta_time, world_map, player_x, player_y, player_state, current_time):
+    """
+    Update the state and behavior of all non-boss enemies.
 
+    Handles enemy AI state transitions (idle, chase, attack), movement,
+    and firing projectiles based on player proximity and line of sight.
+
+    :param delta_time: float, time elapsed since the last frame.
+    :param world_map: list[list[int]], the game map for navigation and LOS checks.
+    :param player_x: float, the player's current x-coordinate.
+    :param player_y: float, the player's current y-coordinate.
+    :param player_state: dict | None, the player's state (used by boss logic indirectly).
+    :param current_time: float, the current game time.
+    :precondition: delta_time must be non-negative.
+    :precondition: world_map must be a valid map.
+    :precondition: player_x, player_y must be valid coordinates.
+    :precondition: current_time must be a valid timestamp.
+    :postcondition: Enemies update their state (idle, chase, attack).
+    :postcondition: Enemies move based on their state and pathfinding/collision checks.
+    :postcondition: Enemies in attack state may fire projectiles at the player.
+    """
     for enemy in enemies:
         if enemy["remove"] or enemy["state"] == "dead":
             continue
@@ -424,8 +515,28 @@ def update_enemies(delta_time, world_map, player_x, player_y, current_time):
 
 
 def update_boss_behavior(boss, delta_time, world_map, player_x, player_y, current_time):
-    """Handle boss-specific AI"""
+    """
+    Update the state and behavior of a boss enemy.
 
+    Handles boss-specific AI, including state transitions, movement,
+    attack patterns (projectiles, summoning, charging), and pattern switching.
+
+    :param boss: dict, the boss entity dictionary.
+    :param delta_time: float, time elapsed since the last frame.
+    :param world_map: list[list[int]], the game map for navigation and LOS checks.
+    :param player_x: float, the player's current x-coordinate.
+    :param player_y: float, the player's current y-coordinate.
+    :param current_time: float, the current game time.
+    :precondition: boss must be a valid boss entity dictionary.
+    :precondition: delta_time must be non-negative.
+    :precondition: world_map must be a valid map.
+    :precondition: player_x, player_y must be valid coordinates.
+    :precondition: current_time must be a valid timestamp.
+    :postcondition: Boss updates its state (idle, chase, attack).
+    :postcondition: Boss switches attack patterns periodically.
+    :postcondition: Boss moves based on its state.
+    :postcondition: Boss executes attacks based on its current pattern and cooldowns.
+    """
     dx = player_x - boss["x"]
     dy = player_y - boss["y"]
     dist_to_player = math.sqrt(dx * dx + dy * dy)
@@ -550,31 +661,6 @@ def clear_entities():
     enemy_projectiles = []
 
 
-def has_line_of_sight(x1, y1, x2, y2, world_map):
-    """Check if there's a clear line of sight between two points"""
-    dx = x2 - x1
-    dy = y2 - y1
-    distance = math.sqrt(dx * dx + dy * dy)
-
-    if distance == 0:
-        return True
-
-    dx /= distance
-    dy /= distance
-
-    steps = max(1, int(distance * 5))
-    step_size = distance / steps
-
-    for i in range(1, steps):
-        check_x = x1 + dx * i * step_size
-        check_y = y1 + dy * i * step_size
-
-        if is_collision(check_x, check_y, world_map):
-            return False
-
-    return True
-
-
 def distort_text(text, distortion_level):
     """Apply distortion to text based on distance"""
     if distortion_level <= 0:
@@ -631,13 +717,6 @@ def spawn_enemies(world_map, count=5):
             if not is_collision(x, y, world_map):
                 create_enemy(x, y)
                 break
-
-
-def distance_between(entity1, entity2):
-    """Calculate the distance between two entities"""
-    dx = entity1["x"] - entity2["x"]
-    dy = entity1["y"] - entity2["y"]
-    return math.sqrt(dx * dx + dy * dy)
 
 
 def award_xp(player_state, amount):
