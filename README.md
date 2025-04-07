@@ -57,6 +57,6 @@ Paradox v(-1.0) is a terminal-based 3D dungeon crawler implemented in Python usi
 *   `anim/`: Contains ASCII art animations such as our hand and the projectiles.
 *   `debug.py`: Implements the debug console and commands.
 
-## Flowchart
+## Flowchart (also can be found [here](Proof of aardwolf.pdf))
 
 ![Flowchart Image](https://github.com/falconnor4/COMP-1510-MUD/blob/main/game.png?raw=true)
