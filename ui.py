@@ -2,7 +2,7 @@ import curses
 import time
 import math
 from anim.hand.fire import FireFrames
-from console_renderer import render_console, DEBUG_CONSOLE
+from renderer.console_renderer import render_console, DEBUG_CONSOLE
 
 UI_MESSAGE = "message"
 UI_STATUS = "status"

@@ -1,6 +1,6 @@
 import curses
 import ui
-from console_renderer import DEBUG_CONSOLE
+from renderer.console_renderer import DEBUG_CONSOLE
 
 COMMANDS = {
     "next": {
