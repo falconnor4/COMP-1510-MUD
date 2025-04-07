@@ -255,10 +255,9 @@ def generate_dungeon(width, height, archetype_key=None):
     return dungeon, archetype_key
 
 
-def generate_dungeon_level(
-    width=40, height=20, min_room_size=5, max_splits=4, player_level=1
-):
-    dungeon_map, archetype = generate_dungeon(width, height)
+def generate_dungeon_level(width=40, height=20, player_level=1):
+    """Generates a complete dungeon level with spawn, exit, and features."""
+    dungeon_map, archetype_key = generate_dungeon(width, height) # Receive key
 
     ensure_connectivity(dungeon_map)
 
@@ -268,16 +267,16 @@ def generate_dungeon_level(
     door_x, door_y = door_point
 
     if player_level >= 3:
-        dungeon_map[door_y][door_x] = 10
+        dungeon_map[door_y][door_x] = 10 # Boss door
     else:
-        dungeon_map[door_y][door_x] = 6
+        dungeon_map[door_y][door_x] = 6 # Regular door
 
-    add_features(dungeon_map, archetype)
-
+    add_features(dungeon_map, archetype_key)
     if not is_valid_spawn(dungeon_map, spawn_x, spawn_y):
         spawn_x, spawn_y = find_safe_spawn_location(dungeon_map, width, height)
 
-    return dungeon_map, spawn_x, spawn_y, archetype
+    # Return the key
+    return dungeon_map, spawn_x, spawn_y, archetype_key
 
 
 def find_safe_spawn_location(dungeon_map, width, height):
