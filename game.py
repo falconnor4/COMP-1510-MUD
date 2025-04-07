@@ -143,7 +143,6 @@ def run_game(stdscr):
 
                 # Update cooldown and status immediately
                 player_state["last_shot_time"] = current_time
-                ui.add_status_effect("Shot fired", "!", duration=1.0, color=1)
 
             # Update entities with player state for XP
             entities.update_entities(
