@@ -158,9 +158,7 @@ def _render_pattern_entity(
         color_attr |= curses.A_DIM
 
     for local_y in range(draw_height):
-        pattern_y = min(
-            pattern_height - 1, int(local_y / draw_height * pattern_height)
-        )
+        pattern_y = min(pattern_height - 1, int(local_y / draw_height * pattern_height))
         screen_pos_y = start_y + local_y
 
         if not (0 <= screen_pos_y < height):
@@ -275,7 +273,11 @@ def render_world(
                     )
 
         distance_to_wall *= math.cos(ray_offset)
-        wall_height = min(height, int(height / distance_to_wall * 2)) if distance_to_wall > 0 else height
+        wall_height = (
+            min(height, int(height / distance_to_wall * 2))
+            if distance_to_wall > 0
+            else height
+        )
         bob_pixels = int(eye_height_offset * height / 4)
 
         wall_top = max(0, height // 2 - wall_height // 2 + bob_pixels)
@@ -382,7 +384,9 @@ def render_world(
             horizontal_shades = get_shading_set("horizontal")
             shade_index = SHADING_CHARS.find(shade_char)
             if shade_index != -1:
-                 shade_char = horizontal_shades[min(len(horizontal_shades) - 1, shade_index)]
+                shade_char = horizontal_shades[
+                    min(len(horizontal_shades) - 1, shade_index)
+                ]
             color_attr |= curses.A_DIM
 
         for y in range(wall_top, wall_bottom + 1):
@@ -390,10 +394,14 @@ def render_world(
                 position_in_wall = (y - wall_top) / max(1, wall_bottom - wall_top)
 
                 char = shade_char
-                if y == wall_top: char = WALL_EDGE_CHARS["top"]
-                elif y == wall_bottom: char = WALL_EDGE_CHARS["bottom"]
-                elif is_left_edge: char = WALL_EDGE_CHARS["left"]
-                elif is_right_edge: char = WALL_EDGE_CHARS["right"]
+                if y == wall_top:
+                    char = WALL_EDGE_CHARS["top"]
+                elif y == wall_bottom:
+                    char = WALL_EDGE_CHARS["bottom"]
+                elif is_left_edge:
+                    char = WALL_EDGE_CHARS["left"]
+                elif is_right_edge:
+                    char = WALL_EDGE_CHARS["right"]
                 elif position_in_wall > 0.8:
                     shade_index = SHADING_CHARS.find(shade_char)
                     if shade_index != -1 and shade_index + 1 < len(SHADING_CHARS):
@@ -418,7 +426,10 @@ def render_world(
         if screen_x < 0 or screen_x >= width:
             continue
 
-        if entity["type"] in [entity_system.ENTITY_PROJECTILE, entity_system.ENTITY_ENEMY_PROJECTILE]:
+        if entity["type"] in [
+            entity_system.ENTITY_PROJECTILE,
+            entity_system.ENTITY_ENEMY_PROJECTILE,
+        ]:
             _render_pattern_entity(
                 stdscr,
                 entity,
@@ -438,10 +449,11 @@ def render_world(
                 color_attr = curses.color_pair(entity_system.ENEMY_DEAD_COLOR)
             elif entity["state"] == "attack":
                 blink_on = int(time.time() * 4) % 2 == 0
-                color_attr = curses.color_pair(entity_system.ENEMY_ALERT_COLOR) | (curses.A_BOLD if blink_on else 0)
+                color_attr = curses.color_pair(entity_system.ENEMY_ALERT_COLOR) | (
+                    curses.A_BOLD if blink_on else 0
+                )
             elif entity["state"] == "chase":
                 color_attr = curses.color_pair(entity_system.ENEMY_ALERT_COLOR)
-
 
             text_height = len(display_text)
             scaled_height = max(1, min(text_height, int(text_height * entity_scale)))
@@ -464,7 +476,10 @@ def render_world(
 
                     is_occluded = False
                     for segment in wall_segments:
-                        if segment["column"] == screen_pos_x and segment["distance"] < entity_distance:
+                        if (
+                            segment["column"] == screen_pos_x
+                            and segment["distance"] < entity_distance
+                        ):
                             is_occluded = True
                             break
 
@@ -476,6 +491,7 @@ def render_world(
                             pass
 
     from renderer.minimap_renderer import render_minimap
+
     render_minimap(
         stdscr, player_x, player_y, player_angle, world_map, world_colors, height, width
     )

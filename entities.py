@@ -263,7 +263,9 @@ def update_entities(delta_time, world_map, player_x, player_y, player_state=None
         delta_time, world_map, player_x, player_y, player_state, current_time
     )
 
-    update_enemies(delta_time, world_map, player_x, player_y, player_state, current_time)
+    update_enemies(
+        delta_time, world_map, player_x, player_y, player_state, current_time
+    )
 
     for enemy in enemies[:]:
         if enemy["state"] == "dead" and not enemy.get("xp_awarded", False):
@@ -412,7 +414,9 @@ def update_enemy_projectiles(
                 continue
 
 
-def update_enemies(delta_time, world_map, player_x, player_y, player_state, current_time):
+def update_enemies(
+    delta_time, world_map, player_x, player_y, player_state, current_time
+):
     """
     Update the state and behavior of all non-boss enemies.
 

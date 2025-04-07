@@ -105,7 +105,7 @@ def run_game(stdscr):
                 running = False
 
         # Check for game over condition *before* processing input/updates for the frame
-        if player_state['health'] <= 0:
+        if player_state["health"] <= 0:
             display_game_over(stdscr, player_state)
             running = False
             return "menu"
@@ -165,10 +165,12 @@ def run_game(stdscr):
 
                 # Check for boss corpse interaction (Game Win condition)
                 for entity in entities.entities:
-                    if (entity.get("subtype") == "boss" and 
-                        entity.get("state") == "dead" and
-                        abs(entity["x"] - player_state["x"]) < 1.5 and
-                        abs(entity["y"] - player_state["y"]) < 1.5):
+                    if (
+                        entity.get("subtype") == "boss"
+                        and entity.get("state") == "dead"
+                        and abs(entity["x"] - player_state["x"]) < 1.5
+                        and abs(entity["y"] - player_state["y"]) < 1.5
+                    ):
                         ui.display_win_screen(stdscr, player_state)
                         return "menu"
 
@@ -189,15 +191,19 @@ def run_game(stdscr):
 
                     # Move player to spawn point
                     player_state["x"], player_state["y"] = player_spawn
-                    
+
                     # Block the entrance behind the player (no way out)
                     entrance_x, entrance_y = int(player_spawn[0]), int(player_spawn[1])
                     wall_y = entrance_y + 2
                     for offset_x in range(-2, 3):
                         try:
                             # Make sure we're not placing walls on the player's position
-                            if 0 <= entrance_y + 2 < len(current_map) and 0 <= entrance_x + offset_x < len(current_map[0]):
-                                current_map[wall_y][entrance_x + offset_x] = 8  # Stone wall
+                            if 0 <= entrance_y + 2 < len(
+                                current_map
+                            ) and 0 <= entrance_x + offset_x < len(current_map[0]):
+                                current_map[wall_y][
+                                    entrance_x + offset_x
+                                ] = 8  # Stone wall
                         except IndexError:
                             pass  # Skip if out of bounds
 
@@ -207,7 +213,9 @@ def run_game(stdscr):
                     entities.create_boss(boss_x, boss_y)
 
                     ui.add_message(
-                        "You entered the Boss Arena! The entrance collapses behind you!", 5.0, color=1
+                        "You entered the Boss Arena! The entrance collapses behind you!",
+                        5.0,
+                        color=1,
                     )
 
                 elif object_type == "stairs":
