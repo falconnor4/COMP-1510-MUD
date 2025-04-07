@@ -40,14 +40,14 @@ def run_game(stdscr):
     def _handle_level_change(level_id):
         """Handles the logic for changing levels/maps."""
         nonlocal current_map, current_colors
-        new_map, new_colors, player_spawn, is_new_dungeon = switch_map(
+        n_map, n_colors, p_spawn, is_new_dungeon = switch_map(
             level_id, player_state["level"]
         )
-        current_map = new_map
-        current_colors = new_colors
+        current_map = n_map
+        current_colors = n_colors
 
         # Move player to spawn point
-        player_state["x"], player_state["y"] = player_spawn
+        player_state["x"], player_state["y"] = p_spawn
 
         # Track stage descent if entering a new dungeon level
         if is_new_dungeon:
@@ -78,8 +78,8 @@ def run_game(stdscr):
     # Setup debug commands
     def change_level():
         """Debug command to change level"""
-        level_to_switch = 2 if current_map == ACTIVE_MAP else 1
-        return _handle_level_change(level_to_switch)
+        switch_level = 2 if current_map == ACTIVE_MAP else 1
+        return _handle_level_change(switch_level)
 
     debug.COMMANDS["next"]["callback"] = change_level
     debug.initialize_commands(player_state, change_level)
