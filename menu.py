@@ -179,7 +179,7 @@ def show_instructions(stdscr):
 
 def show_credits(stdscr):
     """Display game credits"""
-    credits = [
+    credits_menu = [
         "COMP-1510-MUD",
         "",
         "A Terminal-Based 3D Adventure Game",
@@ -206,7 +206,7 @@ def show_credits(stdscr):
         else:
             return curses.color_pair(6) | curses.A_BOLD
 
-    display_screen(stdscr, "CREDITS", credits, credit_styles)
+    display_screen(stdscr, "CREDITS", credits_menu, credit_styles)
 
 
 def display_menu(stdscr):

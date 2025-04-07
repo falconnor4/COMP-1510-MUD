@@ -68,6 +68,7 @@ def start_animation(animation_type="fire", midpoint_callback=None):
         }
 
 
+# noinspection PyCallingNonCallable
 def update_animation():
     """Update the current animation state"""
     global current_animation
