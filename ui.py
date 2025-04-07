@@ -85,7 +85,7 @@ def update_animation():
         > current_animation["frame_delay"]
     ):
         current_animation["frame_index"] += 1
-        current_animation["last_frame_time"] = int(current_time)
+        current_animation["last_frame_time"] = time.time()
 
         if (
             not current_animation["midpoint_triggered"]
