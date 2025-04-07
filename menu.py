@@ -153,7 +153,7 @@ def show_instructions(stdscr):
         "GAME OBJECTIVES:",
         "  Each level spawns more enemies than the last.",
         "  Interact with the boss's corpse to win the game.",
-        "  A boss door will spawn after level 3.",
+        "  A boss door will spawn after level 3, It is marked with 'B' on the map.",
         "",
         "TERRAIN TYPES:",
         "  '#' - Wall       '♣' - Tree",
