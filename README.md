@@ -2,14 +2,14 @@
 
 ## Overview
 
-Paradox v(-1.0) is a terminal-based 3D dungeon crawler implemented in Python using the `curses` library. The game features a raycasting engine, based on classic games such as Wolfenstein 3D / Doom 1993. Rendering a pseudo-3D first-person perspective within a terminal window.
+Paradox v(-1.0) is a terminal-based 3D dungeon crawler implemented in Python using the `curses` library. The game utilizes a raycasting engine, based on classic games such as Wolfenstein 3D / Doom 1993. Rendering a pseudo-3D first-person perspective within a terminal window.
 
 ## Features
 
 *   **3D Raycasting Engine:** Experience a 3d game... In your terminal!
 *   **Procedurally Generated Dungeons:** Explore unique and challenging levels every playthrough.
-*   **Enemies and Combat:** Battle various enemies using your ranged attacks.
-*   **Debug Console:** Use the integrated debug console for testing and development (you can toggle it with `;`). No it doesn't work properly.
+*   **Enemies and Combat:** Battle various enemies using your ranged spells.
+*   **Debug Console:** Use the integrated debug console for testing and development (you can toggle it with `;`). (it doesn't currently work properly.)
 
 ## How to Play
 

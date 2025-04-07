@@ -267,6 +267,7 @@ def generate_dungeon(width, height, archetype_key=None):
     return dungeon, archetype_key
 
 
+# noinspection PyTypeChecker
 def generate_dungeon_level(width=40, height=20, player_level=1):
     """
     Generate a complete dungeon level with spawn, exit, and features.
@@ -405,6 +406,7 @@ def is_open_area(dungeon_map, x, y, radius=1):
     return True
 
 
+# noinspection PyUnresolvedReferences
 def create_safe_spawn_area(dungeon_map, x, y, size=2):
     """
     Create a safe area for spawning by clearing tiles.
@@ -446,7 +448,6 @@ def ensure_connectivity(dmap):
     >>> for idx in range(1, 4): sample_map_connect[1][idx] = 0
     >>> for idx in range(6, 9): sample_map_connect[8][idx] = 0
     >>> ensure_connectivity(sample_map_connect)
-    >>> # After ensuring connectivity, there should be a path between regions (visual inspection or more complex test needed)
     """
     h, w = len(dmap), len(dmap[0])
     visited = set()
