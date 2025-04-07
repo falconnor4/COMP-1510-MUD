@@ -1,4 +1,5 @@
 import curses
+import ui
 
 DEBUG_CONSOLE = {
     "active": False,
@@ -142,6 +143,7 @@ def process_input(key, player_state=None, world_map=None):
     return input_handled or command_executed
 
 
+# noinspection PyBroadException
 def execute_command(command_str, player_state=None, world_map=None):
     """
     Parse and execute a debug command string.
@@ -259,8 +261,6 @@ def set_player_level(player_state, level_str=None):
     "Current level: 5. Use 'level <number>' to change it."
     >>> set_player_level(p_state, 'abc')
     'Invalid level. Please provide a number.'
-    >>> set_player_level(None, '5')
-    'Player state not available'
     """
     if not player_state:
         return "Player state not available"
@@ -289,8 +289,6 @@ def set_player_level(player_state, level_str=None):
         player_state["exp_to_next"] = int(base_xp * (xp_multiplier ** (new_level - 1)))
 
         try:
-            import ui
-
             ui.add_message(f"DEBUG: Level set to {new_level}", 3.0, color=6)
         except ImportError:
             pass

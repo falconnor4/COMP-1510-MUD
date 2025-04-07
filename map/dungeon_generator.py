@@ -419,7 +419,7 @@ def create_safe_spawn_area(dungeon_map, x, y, size=2):
 
     >>> sample_map_create = [[1 for _ in range(10)] for _ in range(10)]
     >>> create_safe_spawn_area(sample_map_create, 5, 5, 1)
-    >>> all(sample_map_create[row][col] == 0 for row in range(4, 7) for col in range(4, 7))
+    >>> all(sample_map_create[row][col] == 0 for row in range(4, 7) for col in range(4, 7)) # I have no clue why the pep8 formatter hates this.
     True
     """
     h, w = len(dungeon_map), len(dungeon_map[0])
@@ -483,13 +483,13 @@ def ensure_connectivity(dmap):
     largest_region = regions[0]
 
     def _carve_connection(x1, y1, x2, y2):
-        cx, cy = x1, y1
-        while cx != x2:
-            dmap[cy][cx] = 0
-            cx += 1 if x2 > x1 else -1
-        while cy != y2:
-            dmap[cy][cx] = 0
-            cy += 1 if y2 > y1 else -1
+        carve_x, carve_y = x1, y1
+        while carve_x != x2:
+            dmap[carve_y][carve_x] = 0
+            carve_x += 1 if x2 > x1 else -1
+        while carve_y != y2:
+            dmap[carve_y][carve_x] = 0
+            carve_y += 1 if y2 > y1 else -1
         dmap[y2][x2] = 0
 
     for i in range(1, len(regions)):

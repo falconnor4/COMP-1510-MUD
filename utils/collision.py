@@ -1,10 +1,16 @@
 """Utility functions for collision detection"""
 
+
 def is_collision(x, y, world_map):
     """Check if a position collides with a wall"""
     grid_x, grid_y = int(x), int(y)
 
-    if grid_y < 0 or grid_y >= len(world_map) or grid_x < 0 or grid_x >= len(world_map[0]):
+    if (
+        grid_y < 0
+        or grid_y >= len(world_map)
+        or grid_x < 0
+        or grid_x >= len(world_map[0])
+    ):
         return True
 
     walkable_types = [0, 4, 9]  # EMPTY, PATH, SAND
@@ -12,7 +18,7 @@ def is_collision(x, y, world_map):
 
 
 def would_collide(x, y, new_x, new_y, world_map):
-    """Advanced collision check with buffer zone"""
+    """Buffered collision check"""
     if is_collision(new_x, new_y, world_map):
         return True
 

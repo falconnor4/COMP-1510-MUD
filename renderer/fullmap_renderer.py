@@ -50,7 +50,7 @@ def render_full_map(stdscr, player_x, player_y, player_angle, world_map, world_c
             screen_x = offset_x + int(x * scale) + 1
 
             cell_type = world_map[y][x]
-            cell_char = terrain_chars.get(cell_type, '?')
+            cell_char = terrain_chars.get(cell_type, "?")
 
             cell_color = int(world_colors[y][x])
 
@@ -68,9 +68,11 @@ def render_full_map(stdscr, player_x, player_y, player_angle, world_map, world_c
     if 0 <= player_screen_y < height and 0 <= player_screen_x < width:
         try:
 
-            player_char = '@'
-            direction_chars = ['↑', '→', '↓', '←']
-            direction_idx = int(((player_angle + math.pi / 4) % (2 * math.pi)) / (math.pi / 2))
+            player_char = "@"
+            direction_chars = ["↑", "→", "↓", "←"]
+            direction_idx = int(
+                ((player_angle + math.pi / 4) % (2 * math.pi)) / (math.pi / 2)
+            )
             direction = direction_chars[direction_idx]
 
             stdscr.attron(curses.color_pair(1) | curses.A_BOLD)
@@ -90,10 +92,9 @@ def render_full_map(stdscr, player_x, player_y, player_angle, world_map, world_c
         ("+ - Door", 5),
         ("≡ - Stairs", 6),
         ("▓ - Stone", 8),
-        (": - Sand", 3)
+        (": - Sand", 3),
     ]
 
-    legend_width = sum(len(item[0]) + 3 for item in legend_items)
     items_per_line = max(1, min(len(legend_items), width // 15))
     item_width = width // items_per_line
 

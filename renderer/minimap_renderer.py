@@ -4,6 +4,7 @@ from map import TERRAIN_CHARS
 from renderer.color_utils import get_cell_style
 
 
+# noinspection PyUnusedLocal
 def render_minimap(
     stdscr, player_x, player_y, player_angle, world_map, world_colors, height, width
 ):

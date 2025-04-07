@@ -32,6 +32,7 @@ def get_shading_set(wall_orientation="vertical"):
     return SHADING_CHARS
 
 
+# noinspection PyUnusedLocal
 def get_distance_shade(distance, max_distance=40, wall_x=0, wall_y=0):
     """Get appropriate shading character and attributes based on distance"""
     norm_distance = min(1.0, distance / max_distance)
@@ -55,6 +56,7 @@ def get_distance_shade(distance, max_distance=40, wall_x=0, wall_y=0):
     return shade_char, color
 
 
+# noinspection PyUnusedLocal
 def shoot_animation(stdscr, height, width):
     """Advanced shooting animation using imported fire frames"""
     if not FireFrames or len(FireFrames) == 0:
@@ -85,7 +87,7 @@ def shoot_animation(stdscr, height, width):
                                 i, j, char, curses.color_pair(1) | curses.A_BOLD
                             )
                         except:
-                            pass
+                            return
 
             prepared_frames.append(tmpwin.instr(0, 0, anim_height * anim_width))
 
