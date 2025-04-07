@@ -343,9 +343,6 @@ def update_projectiles(delta_time, world_map, current_time):
     :postcondition: Player projectiles are moved.
     :postcondition: Projectiles colliding with walls or enemies are marked for removal.
     :postcondition: Enemies hit by projectiles take damage and may change state to 'dead'.
-
-    # Doctest is complex due to dependencies on global lists (projectiles, enemies)
-    # and collision logic. Requires setup and teardown.
     """
     for proj in projectiles[:]:
         if _update_projectile_movement(proj, delta_time, world_map, current_time):

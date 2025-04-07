@@ -247,19 +247,19 @@ def set_player_level(player_state, level_str=None):
     :postcondition: Adds a UI message confirming the change.
     :return: str, a message indicating the result or an error.
     >>> p_state = {'level': 1, 'max_health': 100, 'health': 80, 'exp': 50, 'exp_to_next': 100}
-    >>> set_player_level(p_state, '5') # doctest: +SKIP
+    >>> set_player_level(p_state, '5')
     'Player level changed from 1 to 5. Health set to 180.'
-    >>> p_state['level'] # doctest: +SKIP
+    >>> p_state['level']
     5
-    >>> p_state['max_health'] # doctest: +SKIP
+    >>> p_state['max_health']
     180
-    >>> p_state['health'] # doctest: +SKIP
+    >>> p_state['health']
     180
-    >>> set_player_level(p_state) # doctest: +SKIP
-    'Current level: 5. Use 'level <number>' to change it.'
-    >>> set_player_level(p_state, 'abc') # doctest: +SKIP
+    >>> set_player_level(p_state)
+    "Current level: 5. Use 'level <number>' to change it."
+    >>> set_player_level(p_state, 'abc')
     'Invalid level. Please provide a number.'
-    >>> set_player_level(None, '5') # doctest: +SKIP
+    >>> set_player_level(None, '5')
     'Player state not available'
     """
     if not player_state:
@@ -317,8 +317,6 @@ def teleport_to_boss(player_state=None):
     :postcondition: Updates player_state['x'] and player_state['y'] to the arena entrance.
     :postcondition: Adds UI messages.
     :return: str, a confirmation message.
-
-    # Doctest is not feasible due to heavy dependency on external modules, global state, and side effects.
     """
     if not player_state:
         return "Player state not available"

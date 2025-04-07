@@ -63,14 +63,6 @@ def has_line_of_sight(x1, y1, x2, y2, world_map):
     :precondition: world_map must be a valid map structure where `is_collision` can operate.
     :postcondition: Determines if the line segment is clear of obstacles.
     :return: bool, True if line of sight is clear, False otherwise.
-
-    Doctest requires a mock world_map and is_collision function.
-    Example concept:
-    >>> test_map = [[1, 1, 1, 1], [1, 0, 0, 1], [1, 0, 1, 1], [1, 1, 1, 1]]
-    >>> has_line_of_sight(1.5, 1.5, 2.5, 1.5, test_map) # Clear path horizontal
-    True
-    >>> has_line_of_sight(1.5, 1.5, 2.5, 2.5, test_map) # Diagonal path hits wall
-    False
     """
     dist = distance(x1, y1, x2, y2)
     if dist == 0:

@@ -103,14 +103,6 @@ def generate_color_map(world_map=None, color_shift=0):
     :precondition: color_shift should correspond to a key in `color_shift_effects`.
     :postcondition: Returns a map of the same dimensions containing color codes as strings.
     :return: list[list[str]], the generated color map.
-
-    # Doctest is complex due to dependency on global LEGEND, TERRAIN_COLORS and ACTIVE_MAP.
-    # Example concept:
-    # >>> test_map = [[1, 0], [8, 6]] # Wall, Empty, Stone, Door
-    # >>> generate_color_map(test_map, 0)
-    # [['7', '0'], ['8', '5']] # Default colors
-    # >>> generate_color_map(test_map, 1) # Ruins shift
-    # [['3', '0'], ['3', '5']] # Wall and Stone shifted to color 3
     """
     if world_map is None:
         world_map = ACTIVE_MAP
@@ -427,15 +419,6 @@ def interact_raycast(player_x, player_y, player_angle, world_map):
     :precondition: Player coordinates and angle must be valid. world_map must be a valid map.
     :postcondition: Identifies the type and location of the first interactable or blocking object hit by the ray.
     :return: tuple[str | None, int | None, int | None], the type of object hit ('door', 'boss_door', 'stairs', 'wall', or None), and its (x, y) integer coordinates, or (None, None, None) if nothing is hit within range.
-
-    # Doctest requires a mock world_map.
-    # >>> test_map = [[1, 1, 1, 1], [1, 0, 0, 1], [1, 6, 0, 1], [1, 1, 1, 1]]
-    # >>> interact_raycast(1.5, 1.5, 0, test_map) # Facing right, should hit wall at (2,1) or (3,1) depending on step
-    # ('wall', 2, 1) # Or ('wall', 3, 1)
-    # >>> interact_raycast(1.5, 1.5, math.pi / 2, test_map) # Facing down, should hit door at (1, 2)
-    # ('door', 1, 2)
-    # >>> interact_raycast(1.5, 1.5, math.pi, test_map) # Facing left, should hit wall at (0, 1)
-    # ('wall', 0, 1)
     """
     max_distance = 2.0
     distance = 0
@@ -478,11 +461,6 @@ def generate_char_map():
     :precondition: Global ACTIVE_MAP must be initialized and valid. LEGEND and TERRAIN_TYPES must be defined.
     :postcondition: Returns a map of the same dimensions containing character representations.
     :return: list[list[str]], the character map.
-
-    # Doctest depends on global ACTIVE_MAP state.
-    # >>> # Assume ACTIVE_MAP = [[1, 0], [8, 6]]
-    # >>> generate_char_map()
-    # [['#', ' '], ['▓', '+']]
     """
     char_map = []
     for row in ACTIVE_MAP:
