@@ -7,8 +7,8 @@ Paradox v(-1.0) is a terminal-based 3D dungeon crawler implemented in Python usi
 ## Features
 
 *   **3D Raycasting Engine:** Experience a 3d game... In your terminal!
-*   **Procedurally Generated Dungeons:** Explore unique and challenging levels every playthrough.
-*   **Enemies and Combat:** Battle various enemies using your ranged spells.
+*   **Procedurally Generated Dungeons:** Each floor of the dungeon is procedurally generated. good luck.
+*   **Enemies and Combat:** Battle various enemies using your ranged spells (fireball everything you see!).
 *   **Debug Console:** Use the integrated debug console for testing and development (you can toggle it with `;`). (it doesn't currently work properly.)
 
 ## How to Play
