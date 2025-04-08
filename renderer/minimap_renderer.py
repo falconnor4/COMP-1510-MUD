@@ -10,7 +10,7 @@ def render_minimap(
     """Render an enhanced Aardwolf-style minimap in the corner of the screen"""
 
     map_size = 16
-
+    map_title = "[ MAP ]"
     map_start_x = width - map_size - 2
     map_start_y = 1
 
