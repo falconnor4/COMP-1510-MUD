@@ -4,7 +4,6 @@ from map import TERRAIN_CHARS
 from renderer.color_utils import get_cell_style
 
 
-# noinspection PyUnusedLocal
 def render_minimap(
     stdscr, player_x, player_y, player_angle, world_map, world_colors, height, width
 ):
@@ -15,9 +14,8 @@ def render_minimap(
     map_start_x = width - map_size - 2
     map_start_y = 1
 
-    border_color = curses.color_pair(7) | curses.A_BOLD
+    border_color = curses.color_pair(6) | curses.A_BOLD
 
-    map_title = "[ MAP ]"
     left_border = "╔═"
     right_border = "═╗"
     title_space = map_size - len(left_border) - len(right_border) + 2
@@ -57,7 +55,6 @@ def render_minimap(
     end_x = min(len(world_map[0]), center_x + view_radius + 1)
     end_y = min(len(world_map), center_y + view_radius + 1)
 
-    # Use imported terrain characters
     terrain_chars = TERRAIN_CHARS
 
     for map_y in range(start_y, end_y):
@@ -95,12 +92,15 @@ def render_minimap(
         ):
 
             if entity["type"] == entity_system.ENTITY_PROJECTILE:
-                char = "⊙"
+                char = "*"
                 style = (
                     curses.color_pair(entity_system.PROJECTILE_COLOR) | curses.A_BOLD
                 )
             elif entity["type"] == entity_system.ENTITY_ENEMY:
-                if entity["state"] == "dead":
+                if entity.get("subtype") == "boss":
+                    char = "K"
+                    style = curses.color_pair(1) | curses.A_BOLD
+                elif entity["state"] == "dead":
                     char = "x"
                     style = curses.color_pair(entity_system.ENEMY_DEAD_COLOR)
                 else:
@@ -108,6 +108,9 @@ def render_minimap(
                     style = curses.color_pair(entity_system.ENEMY_COLOR)
                     if entity["state"] in ["chase", "attack"]:
                         style |= curses.A_BOLD
+            elif entity["type"] == entity_system.ENTITY_ENEMY_PROJECTILE:
+                char = "o"
+                style = curses.color_pair(entity_system.ENEMY_PROJECTILE_COLOR) | curses.A_BOLD
             else:
                 char = "?"
                 style = curses.color_pair(7)
@@ -125,29 +128,48 @@ def render_minimap(
         and map_start_x < player_mini_x < map_start_x + map_size
     ):
         try:
-
             player_char = "@"
             player_style = curses.color_pair(1) | curses.A_BOLD
             stdscr.addch(player_mini_y, player_mini_x, player_char, player_style)
 
-            dir_x = int(player_mini_x + math.cos(player_angle))
-            dir_y = int(player_mini_y + math.sin(player_angle))
+            direction_length = 1.0
+            dir_x = player_mini_x + int(math.cos(player_angle) * direction_length)
+            dir_y = player_mini_y + int(math.sin(player_angle) * direction_length)
+            
+            angle_normalized = (player_angle % (2 * math.pi))
+            
+            direction_chars = ["→", "↘", "↓", "↙", "←", "↖", "↑", "↗"]
+            direction_idx = int((angle_normalized / (2 * math.pi) * 8 + 0.5) % 8)
+            direction_char = direction_chars[direction_idx]
+            
+            if dir_x == player_mini_x and dir_y == player_mini_y:
+                dir_x = player_mini_x + int(round(math.cos(player_angle)))
+                dir_y = player_mini_y + int(round(math.sin(player_angle)))
+            
             if (
-                map_start_y < dir_y < map_start_y + map_size
-                and map_start_x < dir_x < map_start_x + map_size
+                map_start_y <= dir_y <= map_start_y + map_size
+                and map_start_x <= dir_x <= map_start_x + map_size
             ):
                 try:
                     stdscr.addch(
-                        dir_y, dir_x, "*", curses.color_pair(3) | curses.A_BOLD
+                        dir_y, dir_x, direction_char, curses.color_pair(3) | curses.A_BOLD
                     )
                 except curses.error:
                     pass
         except curses.error:
             pass
-
-    compass_x = map_start_x + 2
-    compass_y = map_start_y + map_size
+        
+    compass_y_top = map_start_y + 1
+    compass_y_bottom = map_start_y + map_size
+    compass_x_left = map_start_x + 1
+    compass_x_right = map_start_x + map_size
+    
+    compass_style = curses.color_pair(7) | curses.A_DIM
+    
     try:
-        stdscr.addstr(compass_y, compass_x, "N↑", curses.color_pair(7) | curses.A_DIM)
+        stdscr.addstr(compass_y_top, compass_x_left, "NW", compass_style)
+        stdscr.addstr(compass_y_top, compass_x_right - 1, "NE", compass_style)
+        stdscr.addstr(compass_y_bottom, compass_x_left, "SW", compass_style)
+        stdscr.addstr(compass_y_bottom, compass_x_right - 1, "SE", compass_style)
     except curses.error:
         pass

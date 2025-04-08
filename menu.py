@@ -155,12 +155,6 @@ def show_instructions(stdscr):
         "  Interact with the boss's corpse to win the game.",
         "  A boss door will spawn after level 3, It is marked with 'B' on the map.",
         "",
-        "TERRAIN TYPES:",
-        "  '#' - Wall       '♣' - Tree",
-        "  '~' - Water      '·' - Path",
-        "  '▲' - Mountain   '+' - Door",
-        "  '≡' - Stairs     '▓' - Stone",
-        "  ':' - Sand       ' ' - Empty",
     ]
 
     def instruction_styles(i, line):
@@ -185,17 +179,16 @@ def show_credits(stdscr):
         "A Terminal-Based 3D Adventure Game",
         "",
         "Created by:",
-        "  Connor Brown",
+        "Connor Brown",
         "",
         "Inspired by:",
-        "  ID Software's Doom",
-        "  Aardwolf MUD",
-        "  Classic ASCII Roguelikes",
+        "ID Software's Doom",
+        "ID Software's Wolfenstein 3D",
+        "Aardwolf MUD",
         "",
         "Special thanks to:",
-        "  The Python Community",
-        "  The Curses Library",
-        "  BCIT",
+        "The Curses Library",
+        "BCIT",
     ]
 
     def credit_styles(i, line):

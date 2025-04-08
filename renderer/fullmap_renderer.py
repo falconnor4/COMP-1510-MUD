@@ -27,7 +27,7 @@ def render_full_map(stdscr, player_x, player_y, player_angle, world_map, world_c
     offset_x = int((width - (map_width * scale)) / 2)
     offset_y = int((height - (map_height * scale)) / 2)
 
-    title = "[ FULL MAP ]"
+    title = "[ DUNGEON MAP ]"
     title_x = max(0, (width - len(title)) // 2)
     stdscr.attron(curses.color_pair(3) | curses.A_BOLD)
     stdscr.addstr(1, title_x, title)
@@ -93,6 +93,9 @@ def render_full_map(stdscr, player_x, player_y, player_angle, world_map, world_c
         ("≡ - Stairs", 6),
         ("▓ - Stone", 8),
         (": - Sand", 3),
+        ("B - Boss Door", 1),
+        ("  - Empty", 0),
+        ("@ - You", 1),
     ]
 
     items_per_line = max(1, min(len(legend_items), width // 15))
@@ -104,9 +107,9 @@ def render_full_map(stdscr, player_x, player_y, player_angle, world_map, world_c
         legend_x = 2 + col * item_width
 
         try:
-            stdscr.attron(curses.color_pair(color))
+            stdscr.attron(curses.color_pair(color) | (curses.A_BOLD if color in [1, 5, 6] else 0))
             stdscr.addstr(legend_y - line, legend_x, text)
-            stdscr.attroff(curses.color_pair(color))
+            stdscr.attroff(curses.color_pair(color) | (curses.A_BOLD if color in [1, 5, 6] else 0))
         except curses.error:
             pass
 
