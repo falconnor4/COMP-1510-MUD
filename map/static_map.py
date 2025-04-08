@@ -1,11 +1,94 @@
 import math
-from . import (
-    TERRAIN_COLORS, LEGEND, TERRAIN_CHARS,
-    WORLD_MAP, ACTIVE_MAP, CURRENT_MAP_TYPE, CURRENT_COLOR_SHIFT,
-    DIRECTIONS
-)
 
-ACTIVE_COLORS = None
+
+TERRAIN_TYPES = {
+    "WALL": "#",
+    "STONE": "▓",
+    "TREE": "♣",
+    "MOUNTAIN": "▲",
+    "WATER": "~",
+    "GRASS": ".",
+    "PATH": "·",
+    "SAND": ":",
+    "DOOR": "+",
+    "STAIRS": "≡",
+    "EMPTY": " ",
+    "BOSS_DOOR": "B",
+}
+
+
+TERRAIN_COLORS = {
+    "WALL": 7,
+    "STONE": 8,
+    "TREE": 2,
+    "MOUNTAIN": 7,
+    "WATER": 4,
+    "GRASS": 2,
+    "PATH": 3,
+    "SAND": 3,
+    "DOOR": 5,
+    "STAIRS": 6,
+    "EMPTY": 0,
+    "BOSS_DOOR": 1,
+}
+
+
+LEGEND = {
+    0: "EMPTY",
+    1: "WALL",
+    2: "TREE",
+    3: "WATER",
+    4: "PATH",
+    5: "MOUNTAIN",
+    6: "DOOR",
+    7: "STAIRS",
+    8: "STONE",
+    9: "SAND",
+    10: "BOSS_DOOR",
+}
+
+
+TERRAIN_CHARS = {
+    0: " ",
+    1: "#",
+    2: "♣",
+    3: "~",
+    4: "·",
+    5: "▲",
+    6: "+",
+    7: "≡",
+    8: "▓",
+    9: ":",
+    10: "B",
+}
+
+WORLD_MAP = [
+    [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 2, 2, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 2, 2, 2, 0, 8],
+    [8, 0, 2, 2, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 2, 2, 2, 0, 8],
+    [8, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 4, 0, 0, 1, 6, 1, 0, 0, 4, 0, 0, 5, 5, 0, 8],
+    [8, 0, 0, 0, 0, 4, 0, 0, 1, 0, 1, 0, 0, 4, 0, 0, 5, 5, 0, 8],
+    [8, 2, 2, 0, 0, 4, 0, 0, 1, 0, 1, 0, 0, 4, 0, 0, 5, 5, 0, 8],
+    [8, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 4, 4, 4, 4, 0, 4, 4, 4, 4, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 0, 0, 8],
+    [8, 0, 0, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 0, 0, 8],
+    [8, 0, 0, 3, 3, 3, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8],
+    [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8],
+]
+
+ACTIVE_MAP = WORLD_MAP
+
+CURRENT_MAP_TYPE = 0
+
+CURRENT_COLOR_SHIFT = 0
+
+
+DIRECTIONS = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
 
 def generate_color_map(world_map=None, color_shift=0):
@@ -47,6 +130,9 @@ def generate_color_map(world_map=None, color_shift=0):
                 color_row.append(str(TERRAIN_COLORS[terrain_type]))
         color_map.append(color_row)
     return color_map
+
+
+ACTIVE_COLORS = generate_color_map(ACTIVE_MAP)
 
 
 def generate_new_dungeon(width=40, height=20):
@@ -430,6 +516,9 @@ def get_map_str(player_x, player_y):
                 row_str += cell
         map_str += row_str + "\n"  # Add newline after each row
     return map_str.strip()  # Remove trailing newline
+
+
+WORLD_COLORS = generate_color_map()
 
 
 def get_terrain_at(x, y):
