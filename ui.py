@@ -332,7 +332,7 @@ def draw_fire_frame(stdscr, frame):
             if 0 <= y_pos < height and 0 <= x_pos < width:
                 try:
 
-                    stdscr.addch(
+                    stdscr.addstr(
                         y_pos, x_pos, char, curses.color_pair(1) | curses.A_BOLD
                     )
                 except curses.error:

@@ -75,7 +75,7 @@ def render_minimap(
                 style = get_cell_style(cell_type, cell_color)
 
                 try:
-                    stdscr.addch(mini_y, mini_x, cell_char, style)
+                    stdscr.addstr(mini_y, mini_x, cell_char, style)
                 except curses.error:
                     pass
 
@@ -116,7 +116,7 @@ def render_minimap(
                 style = curses.color_pair(7)
 
             try:
-                stdscr.addch(mini_y, mini_x, char, style)
+                stdscr.addstr(mini_y, mini_x, char, style)
             except curses.error:
                 pass
 
@@ -130,7 +130,7 @@ def render_minimap(
         try:
             player_char = "@"
             player_style = curses.color_pair(1) | curses.A_BOLD
-            stdscr.addch(player_mini_y, player_mini_x, player_char, player_style)
+            stdscr.addstr(player_mini_y, player_mini_x, player_char, player_style)
 
             direction_length = 1.0
             dir_x = player_mini_x + int(math.cos(player_angle) * direction_length)
@@ -151,7 +151,7 @@ def render_minimap(
                 and map_start_x <= dir_x <= map_start_x + map_size
             ):
                 try:
-                    stdscr.addch(
+                    stdscr.addstr(
                         dir_y, dir_x, direction_char, curses.color_pair(3) | curses.A_BOLD
                     )
                 except curses.error:

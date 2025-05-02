@@ -488,7 +488,8 @@ def render_world(
                     if not is_occluded and j < len(line):
                         try:
                             char = line[j]
-                            stdscr.addch(screen_pos_y, screen_pos_x, char, color_attr)
+                            safe_char = char.replace('\0', '?')
+                            stdscr.addch(screen_pos_y, screen_pos_x, safe_char, color_attr)
                         except curses.error:
                             pass
 

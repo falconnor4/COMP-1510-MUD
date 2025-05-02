@@ -58,7 +58,7 @@ def render_full_map(stdscr, player_x, player_y, player_angle, world_map, world_c
 
             if 0 <= screen_y < height and 0 <= screen_x < width:
                 try:
-                    stdscr.addch(screen_y, screen_x, cell_char, style)
+                    stdscr.addstr(screen_y, screen_x, cell_char, style)
                 except curses.error:
                     pass
 
