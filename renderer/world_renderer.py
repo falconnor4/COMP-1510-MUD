@@ -83,7 +83,7 @@ def shoot_animation(stdscr, height, width):
                 for j, char in enumerate(line):
                     if char != " " and char != "\t":
                         try:
-                            tmpwin.addch(
+                            tmpwin.addstr(
                                 i, j, char, curses.color_pair(1) | curses.A_BOLD
                             )
                         except:
@@ -192,7 +192,7 @@ def _render_pattern_entity(
                 char = pattern[pattern_y][pattern_x]
                 if char != " ":
                     try:
-                        stdscr.addch(screen_pos_y, screen_pos_x, char, color_attr)
+                        stdscr.addstr(screen_pos_y, screen_pos_x, char, color_attr)
                     except curses.error:
                         pass
 
@@ -409,7 +409,7 @@ def render_world(
                     if shade_index != -1 and shade_index + 1 < len(SHADING_CHARS):
                         char = SHADING_CHARS[shade_index + 1]
 
-                stdscr.addch(y, column, char, color_attr)
+                stdscr.addstr(y, column, char, color_attr)
             except curses.error:
                 pass
 
@@ -489,7 +489,7 @@ def render_world(
                         try:
                             char = line[j]
                             safe_char = char.replace('\0', '?')
-                            stdscr.addch(screen_pos_y, screen_pos_x, safe_char, color_attr)
+                            stdscr.addstr(screen_pos_y, screen_pos_x, safe_char, color_attr)
                         except curses.error:
                             pass
 
