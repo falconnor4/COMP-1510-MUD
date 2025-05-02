@@ -193,6 +193,8 @@ def _render_pattern_entity(
                 if char != " ":
                     try:
                         stdscr.addch(screen_pos_y, screen_pos_x, char, color_attr)
+                    except OverflowError:
+                        stdscr.addstr(screen_pos_y, screen_pos_x, char, color_attr)
                     except curses.error:
                         pass
 
@@ -409,7 +411,12 @@ def render_world(
                     if shade_index != -1 and shade_index + 1 < len(SHADING_CHARS):
                         char = SHADING_CHARS[shade_index + 1]
 
-                stdscr.addch(y, column, char, color_attr)
+                try:
+                    stdscr.addch(y, column, char, color_attr)
+                except OverflowError:
+                    stdscr.addstr(y, column, char, color_attr)
+                except curses.error:
+                    pass
             except curses.error:
                 pass
 
@@ -489,6 +496,8 @@ def render_world(
                         try:
                             char = line[j]
                             stdscr.addch(screen_pos_y, screen_pos_x, char, color_attr)
+                        except OverflowError:
+                            stdscr.addstr(screen_pos_y, screen_pos_x, char, color_attr)
                         except curses.error:
                             pass
 
