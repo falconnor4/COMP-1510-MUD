@@ -20,8 +20,8 @@ Paradox v(-1.0) is a terminal-based 3D dungeon crawler implemented in Python usi
 2.  **Installation:**
 
     ```bash
-    git clone https://github.com/falconnor4/COMP-1510-MUD
-    cd COMP-1510-MUD
+    git clone https://github.com/falconnor4/Termi-Mud
+    cd Termi-Mud
     ```
 
 3.  **Running the Game:**
@@ -59,4 +59,4 @@ Paradox v(-1.0) is a terminal-based 3D dungeon crawler implemented in Python usi
 
 ## Flowchart (also can be found [here](game.pdf))
 
-![Flowchart Image](https://github.com/falconnor4/COMP-1510-MUD/blob/main/game.png?raw=true)
+![Flowchart Image](https://github.com/falconnor4/Termi-Mud/blob/main/game.png?raw=true)
